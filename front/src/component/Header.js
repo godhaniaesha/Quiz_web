@@ -4,7 +4,8 @@ import "../style/x_app.css";
 
 const Header = ({ toggleSidebar }) => {
     return (
-        <header className="header">
+        <section className='x_header'>
+            <header className="header">
             <div className="x_header-left">
                 <button className="menu-btn" onClick={toggleSidebar}><IoMenu /></button>
                 <div className="x_logo-wrap">
@@ -29,6 +30,7 @@ const Header = ({ toggleSidebar }) => {
             </div>
             
         </header>
+        </section>
     );
 };
 

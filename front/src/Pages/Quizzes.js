@@ -1,8 +1,9 @@
 import React from "react";
+import Layout from "../component/Layout";
 const Quizzes = () => (
-  <div>
+  <Layout>
     <h2>Quizzes</h2>
     <p>Manage quizzes here.</p>
-  </div>
+  </Layout>
 );
 export default Quizzes;

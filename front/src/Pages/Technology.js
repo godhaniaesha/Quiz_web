@@ -1,9 +1,9 @@
 import React from "react";
 import Layout from "../component/Layout";
-const Users = () => (
+const Technology = () => (
   <Layout>
-    <h2>Users</h2>
+    <h2>Technology</h2>
     <p>Manage your users here.</p>
   </Layout>
 );
-export default Users;
+export default Technology;

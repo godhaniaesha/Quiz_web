@@ -1,8 +1,9 @@
 import React from "react";
+import Layout from "../component/Layout";
 const Questions = () => (
-  <div>
+  <Layout>
     <h2>Questions</h2>
     <p>View and manage questions here.</p>
-  </div>
+  </Layout>
 );
 export default Questions;
