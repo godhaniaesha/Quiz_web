@@ -4,6 +4,7 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import Dashboard from '../Pages/Dashboard';
 
 
 export default function Main() {
@@ -38,9 +39,8 @@ export default function Main() {
         <div className="sidebar-overlay" onClick={handleOverlayClick}></div>
       )}
       <Header toggleSidebar={toggleSidebar} />
-      <div className="main-content">
-        <h2>Welcome to Quiz Admin Panel</h2>
-        <p>Manage your quizzes, users, and results efficiently.</p>
+      <div className="main-content w-100">
+        <Dashboard></Dashboard>
       </div>
     </div>
   );

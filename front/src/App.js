@@ -8,6 +8,9 @@ import Sidebar from './component/Sidebar';
 import Main from './component/Main';
 import Register from './Pages/Register';
 import Quiz from './Pages/Quiz';
+import AddQuestion from './Pages/AddQuestion';
+import Profile from './Pages/Profile';
+import AdminLogin from './Pages/AdminLogin';
 
 function App() {
   return (
@@ -22,6 +25,9 @@ function App() {
 
         <Route path='/register' element={<Register />}></Route>
         <Route path='/Quiz' element={<Quiz />}></Route>
+        <Route path='/AddQuestion' element={<AddQuestion />}></Route>
+        <Route path='/Profile' element={<Profile />}></Route>
+        <Route path='/AdminLogin' element={<AdminLogin />}></Route>
        
       </Routes>
     </BrowserRouter>
