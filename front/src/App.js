@@ -18,6 +18,9 @@ import Dashboard from './Pages/Dashboard';
 import Technology from './Pages/Technology';
 import Questions from './Pages/Questions';
 import Quizzes from './Pages/Quizzes';
+import AddQuestion from './Pages/AddQuestion';
+import Profile from './Pages/Profile';
+import AdminLogin from './Pages/AdminLogin';
 
 function App() {
   return (
@@ -45,6 +48,9 @@ function App() {
         <Route path='/Quiz' element={<Quiz />}></Route>
         <Route path='/Questions' element={<Questions />}></Route>
         <Route path='/Quizzes' element={<Quizzes />}></Route>
+        <Route path='/AddQuestion' element={<AddQuestion />}></Route>
+        <Route path='/Profile' element={<Profile />}></Route>
+        <Route path='/AdminLogin' element={<AdminLogin />}></Route>
        
       </Routes>
     </BrowserRouter>

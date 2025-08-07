@@ -227,6 +227,7 @@ export default function Quiz() {
             <div className="d_quiz-wrapper d-flex justify-content-center align-items-center">
                 <div className="d_quiz-container ">
                     <div className="container">
+                        
                         <div className="d_result-card card mx-auto text-center p-4">
                             <div className="d_result-logo-wrapper mb-3">
                                 <img src={require('../Image/ki.png')} alt="Logo" className="d_quiz-logo mb-3" />
@@ -258,9 +259,11 @@ export default function Quiz() {
             <div className="d_quiz-wrapper d-flex justify-content-center align-items-center">
                 <div className="d_quiz-container ">
                     <div className="container">
+                        <div className="w-100 text-center mb-4">
+                            <img src={require('../Image/ki.png')} alt="Logo" className="mx-auto d_quiz-logo" />
+                        </div>
                         <div className="d_top-bar">
                             <div className="d-flex flex-wrap justify-content-between align-items-center gap-md-3 gap-2">
-                                <img src={require('../Image/ki.png')} alt="Logo" className="d_quiz-logo" />
                                 <h5 className="d_quiz-title mb-0">Tech Quiz Challenge</h5>
 
                                 <div className="d_progress-section flex-grow-1 mx-3">
