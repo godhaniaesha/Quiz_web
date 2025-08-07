@@ -1,8 +1,10 @@
 import React from 'react';
 import { IoMenu } from "react-icons/io5";
+import { useNavigate } from 'react-router-dom';
 import "../style/x_app.css";
 
 const Header = ({ toggleSidebar }) => {
+    const navigate = useNavigate();
     return (
         <section className='x_header'>
             <header className="header">
@@ -17,7 +19,7 @@ const Header = ({ toggleSidebar }) => {
                 </div>
             </div>
             
-            <div className="x_user-profile">
+            <div className="x_user-profile" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
                 <img
                     src="https://randomuser.me/api/portraits/men/32.jpg"
                     alt="User"

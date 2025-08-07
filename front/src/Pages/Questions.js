@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { FaEye, FaEdit, FaTrash, FaPlus, FaSearch } from "react-icons/fa";
 import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 import "../style/z_style.css";
+import Layout from "../component/Layout";
 
 const Questions = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterTechnology, setFilterTechnology] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
@@ -129,7 +132,7 @@ const Questions = () => {
   };
 
   return (
-    <>
+    <Layout>
       <div className="Z_container">
         {/* Page Header */}
         <div className="Z_page_header">
@@ -160,7 +163,10 @@ const Questions = () => {
         {/* Controls Row - All in One Line */}
         <div className="row align-items-center mb-3 z_gap">
           <div className="col-md-3">
-            <button className="Z_add_new_btn w-100">
+            <button 
+              className="Z_add_new_btn w-100" 
+              onClick={() => navigate("/AddQuestion")}
+            >
               <FaPlus />
               Add New Question
             </button>
@@ -294,7 +300,7 @@ const Questions = () => {
           </div>
         )}
       </div>
-    </>
+    </Layout>
   );
 };
 

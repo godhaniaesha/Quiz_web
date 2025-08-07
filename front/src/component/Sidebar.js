@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import "../style/x_app.css";
 import LogoutModal from './LogoutModal';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Function to handle menu item click
   const handleMenuItemClick = () => {
@@ -38,7 +39,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
           <NavLink
             to="/questions"
-            className={({ isActive }) => isActive ? "active" : ""}
+            className={({ isActive }) => 
+              isActive || location.pathname === "/AddQuestion" ? "active" : ""
+            }
             onClick={handleMenuItemClick}
           >
             <li>Questions</li>

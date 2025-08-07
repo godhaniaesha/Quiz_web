@@ -517,8 +517,8 @@
 }
 /* AddQuestion (d_AQ) custom styles */
 .d_AQ_wrap {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #e0e7ff 0%, #f5f7fa 100%);
+  /* min-height: 100vh; */
+  /* background: linear-gradient(135deg, #e0e7ff 0%, #f5f7fa 100%); */
   display: flex;
   justify-content: center;
   align-items: flex-start;

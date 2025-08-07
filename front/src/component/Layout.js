@@ -25,7 +25,7 @@ const Layout = ({ children }) => {
         <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
       )}
       <Header toggleSidebar={toggleSidebar} />
-      <div className="main-content">{children}</div>
+      <div className="main-content w-100">{children}</div>
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Button, Row, Col, InputGroup } from 'react-bootstrap';
 import { FaPlus, FaCheckCircle } from 'react-icons/fa';
 import '../style/d_style.css';
+import Layout from '../component/Layout';
 
 const techLanguages = [
     { id: 1, name: 'JavaScript' },
@@ -69,6 +70,7 @@ export default function AddQuestion() {
     };
 
     return (
+        <Layout>
         <div className="d_AQ_wrap d-flex justify-content-center align-items-center py-4">
             <div className="d_AQ_card w-100">
                 <h2 className="d_AQ_title mb-4 text-center">Add Tech Language Question</h2>
@@ -175,5 +177,6 @@ export default function AddQuestion() {
                 </Form>
             </div>
         </div>
+        </Layout>
     );
 }

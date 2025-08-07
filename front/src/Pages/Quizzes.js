@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import "../style/z_style.css";
+import Layout from "../component/Layout";
+import { useNavigate } from "react-router-dom";
 
 const Quizzes = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
@@ -161,6 +164,7 @@ const Quizzes = () => {
   };
 
   return (
+    <Layout>
     <div className="Z_container">
       {/* Page Header */}
       <div className="Z_page_header">
@@ -189,7 +193,8 @@ const Quizzes = () => {
       </div>
 
       {/* Add New Button */}
-      <button className="Z_add_new_btn">
+      <button className="Z_add_new_btn"
+      onClick={() => navigate("/register")}>
         <span>+</span>
         Create New Quiz
       </button>
@@ -339,6 +344,7 @@ const Quizzes = () => {
         </div>
       )}
     </div>
+    </Layout>
   );
 };
 

@@ -16,8 +16,8 @@ import Questions from './Pages/Questions';
 import Quizzes from './Pages/Quizzes';
 import Dashboard from './Pages/Dashboard';
 import Technology from './Pages/Technology';
-import Questions from './Pages/Questions';
-import Quizzes from './Pages/Quizzes';
+// import Questions from './Pages/Questions';
+// import Quizzes from './Pages/Quizzes';
 import AddQuestion from './Pages/AddQuestion';
 import Profile from './Pages/Profile';
 import AdminLogin from './Pages/AdminLogin';
@@ -39,8 +39,7 @@ function App() {
         <Route path='/questions' element={<Questions />}></Route>
         <Route path='/results' element={<Results />}></Route>
         <Route path='/techn' element={<Technology />}></Route>
-        <Route path='/logout' element={<Logout />}></Route>
-                
+        <Route path='/logout' element={<Logout />}></Route>             
 
 
 
