@@ -16,6 +16,8 @@ import Questions from './Pages/Questions';
 import Quizzes from './Pages/Quizzes';
 import Dashboard from './Pages/Dashboard';
 import Technology from './Pages/Technology';
+import Questions from './Pages/Questions';
+import Quizzes from './Pages/Quizzes';
 
 function App() {
   return (
@@ -41,6 +43,8 @@ function App() {
 
         <Route path='/register' element={<Register />}></Route>
         <Route path='/Quiz' element={<Quiz />}></Route>
+        <Route path='/Questions' element={<Questions />}></Route>
+        <Route path='/Quizzes' element={<Quizzes />}></Route>
        
       </Routes>
     </BrowserRouter>
