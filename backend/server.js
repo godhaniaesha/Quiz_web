@@ -27,6 +27,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
@@ -42,6 +43,10 @@ connectDB()
 // Mount each router individually
 app.use('/api/tech', routers.techRoutes);
 app.use('/api/question', routers.questionRoutes);
+app.use('/api/auth', routers.registerRoutes);
+app.use('/api/quiz', routers.quizRoutes);
+
+
  
 // Serve uploads folder
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
