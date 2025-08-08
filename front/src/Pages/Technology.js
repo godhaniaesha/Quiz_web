@@ -224,4 +224,4 @@ const Technology = () => {
   );
 };
 
-export default Technology;0
+export default Technology;
