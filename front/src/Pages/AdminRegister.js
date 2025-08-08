@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import '../style/d_style.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-export default function AdminLogin() {
+export default function AdminRegister() {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
+        phone: '',
     });
 
     const [showPassword, setShowPassword] = useState(false);
@@ -19,6 +20,7 @@ export default function AdminLogin() {
     const validate = () => {
         const newErrors = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phoneRegex = /^[0-9]{10}$/;
 
         if (!formData.email.trim()) {
             newErrors.email = 'Email is required';
@@ -30,6 +32,12 @@ export default function AdminLogin() {
             newErrors.password = 'Password is required';
         } else if (formData.password.length < 6) {
             newErrors.password = 'Password must be at least 6 characters';
+        }
+
+        if (!formData.phone.trim()) {
+            newErrors.phone = 'Phone number is required';
+        } else if (!phoneRegex.test(formData.phone)) {
+            newErrors.phone = 'Phone number must be 10 digits';
         }
 
         setErrors(newErrors);
@@ -69,6 +77,19 @@ export default function AdminLogin() {
                             {errors.email && <small className="d_auth_error">{errors.email}</small>}
                         </div>
 
+                        <div className="d_auth_group mt-3">
+                            <label className="d_auth_label">Phone Number</label>
+                            <input
+                                type="text"
+                                name="phone"
+                                placeholder="Enter 10-digit phone number"
+                                className="d_auth_input"
+                                value={formData.phone}
+                                onChange={handleChange}
+                            />
+                            {errors.phone && <small className="d_auth_error">{errors.phone}</small>}
+                        </div>
+
                         <div className="d_auth_group position-relative mt-3">
                             <label className="d_auth_label">Password</label>
                             <input
@@ -83,19 +104,12 @@ export default function AdminLogin() {
                                 {showPassword ? <FaEyeSlash /> : <FaEye />}
                             </span>
                             {errors.password && <small className="d_auth_error">{errors.password}</small>}
-                        
                         </div>
 
-<div className="d-flex justify-content-end align-items-center mt-2">
- 
- <a href="/AdminForgotPassword" className=" small" style={{color:'#6159a1',textDecoration:'none'}}>Forgot Password?</a></div>
                         <button type="submit" className="d_auth_btn mt-3">Sign In</button>
-                       
-<div className="d-flex justify-content-end align-items-center mt-2">
- 
-  <a href="/AdminLogin" className=" small" style={{color:'#6159a1',textDecoration:'none'}}>Already have an account?</a>
-</div>
-
+                            <p className="d_auth_footer">
+                        Don’t have an account? <a href="/AdminLogin" className="text-info">Create Account</a>
+                    </p>
                     </form>
                 </div>
             </div>

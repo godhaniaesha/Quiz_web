@@ -57,7 +57,7 @@ body {
 .x_sidebar .sidebar ul li:active {
   background-color: #e0d7fa;
   /* light purple for hover */
-  color: #6c2bd7;
+  color: #6159a1;
   /* theme accent for text */
   outline: none;
   text-decoration: none;
@@ -65,18 +65,18 @@ body {
 /* Highlight active sidebar link (same as hover/active) */
 .x_sidebar .sidebar ul .active {
   background-color: #e0d7fa;
-  color: #6c2bd7 !important;
+  color: #6159a1 !important;
   outline: none;
   text-decoration: none;
   border-radius: 2px;
 }
 .x_sidebar .sidebar ul .active li {
-  color: #6c2bd7 !important;
+  color: #6159a1 !important;
 }
 .x_sidebar .sidebar ul li.active,
 .x_sidebar .sidebar ul li[aria-current="page"] {
   background-color: #e0d7fa;   /* light purple for hover/active */
-  color: #6c2bd7;              /* theme accent for text */
+  color: #6159a1;              /* theme accent for text */
   outline: none;
   text-decoration: none;
 }
@@ -91,7 +91,7 @@ body {
 /* Active state (add 'active' class in React for current page) */
 .x_sidebar .sidebar ul li.active,
 .x_sidebar .sidebar ul li[aria-current="page"] {
-  background-color: #6c2bd7;
+  background-color: #6159a1;
   /* theme accent */
   color: #fff;
 }
@@ -100,7 +100,7 @@ body {
 .x_sidebar .sidebar ul li:focus-visible {
   box-shadow: 0 0 0 2px #a084e8;
   background-color: #e0d7fa;
-  color: #6c2bd7;
+  color: #6159a1;
 }
 
 /* Sidebar background and border */
@@ -127,7 +127,7 @@ body {
 
 /* Close button for sidebar */
 .close-btn {
-  color: #6c2bd7;
+  color: #6159a1;
   background: transparent;
   border: none;
   font-size: 22px;
@@ -390,7 +390,7 @@ body {
 .x_modal-title {
   font-size: 1.45rem;
   font-weight: 700;
-  color: #6c2bd7;
+  color: #6159a1;
   margin-bottom: 8px;
   letter-spacing: 0.02em;
 }
@@ -423,26 +423,26 @@ body {
 
 .x_btn-cancel {
   background: #fff;
-  color: #6c2bd7;
+  color: #6159a1;
   border: 1.5px solid #e0d7fa;
 }
 
 .x_btn-cancel:hover,
 .x_btn-cancel:focus {
   background: #e0d7fa;
-  color: #6c2bd7;
+  color: #6159a1;
   box-shadow: 0 2px 12px rgba(108,43,215,0.12);
 }
 
 .x_btn-logout {
-  background: linear-gradient(90deg, #6c2bd7 0%, #a084e8 100%);
+  background: linear-gradient(90deg, #6159a1 0%, #a084e8 100%);
   color: #fff;
   border: none;
 }
 
 .x_btn-logout:hover,
 .x_btn-logout:focus {
-  background: linear-gradient(90deg, #a084e8 0%, #6c2bd7 100%);
+  background: linear-gradient(90deg, #a084e8 0%, #6159a1 100%);
   box-shadow: 0 2px 16px rgba(108,43,215,0.18);
 }
 

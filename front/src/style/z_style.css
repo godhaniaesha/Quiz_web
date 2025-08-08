@@ -9,7 +9,7 @@
 }
 
 .Z_page_header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #6159a1;
   color: white;
   padding: 20px;
   border-radius: 10px;
@@ -45,7 +45,7 @@
 }
 
 .Z_table_header {
-  background: #8e4fd8;
+  background: #6159a1;
   color: white;
 }
 
@@ -54,6 +54,7 @@
   text-align: left;
   font-weight: 600;
   font-size: 0.9rem;
+  text-wrap: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -125,7 +126,7 @@
 }
 
 .Z_status_switch_input:checked + .Z_status_switch_slider {
-  background: linear-gradient(135deg, #8e4fd8 0%, #7a3fc4 100%);
+  background: linear-gradient(135deg, #6159a1 0%, #7a3fc4 100%);
 }
 
 .Z_status_switch_input:checked + .Z_status_switch_slider:before {
@@ -133,7 +134,7 @@
 }
 
 .Z_status_switch_input:focus + .Z_status_switch_slider {
-  box-shadow: 0 0 1px #8e4fd8;
+  box-shadow: 0 0 1px #6159a1;
 }
 
 .Z_status_text {
@@ -266,7 +267,7 @@
 
 /* Add New Button */
 .Z_add_new_btn {
-  background: linear-gradient(135deg, #8e4fd8 0%, #7a3fc4 100%);
+  background: linear-gradient(90deg, #6159a1 0%, #a084e8 100%);
   color: white;
   padding: 10px 24px;
   border: none;
@@ -316,7 +317,7 @@
 
 .Z_search_input:focus {
   outline: none;
-  border-color: #8e4fd8;
+  border-color: #6159a1;
 }
 
 .Z_filter_select {
@@ -330,7 +331,7 @@
 
 .Z_filter_select:focus {
   outline: none;
-  border-color: #8e4fd8;
+  border-color: #6159a1;
 }
 
 /* Pagination */
@@ -346,21 +347,21 @@
   padding: 8px 12px;
   border: 1px solid #dee2e6;
   background: white;
-  color: #8e4fd8;
+  color: #6159a1;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .Z_pagination_btn:hover {
-  background: #8e4fd8;
+  background: #6159a1;
   color: white;
 }
 
 .Z_pagination_btn_active {
-  background: #8e4fd8;
+  background: #6159a1;
   color: white;
-  border-color: #8e4fd8;
+  border-color: #6159a1;
 }
 
 .Z_pagination_btn:disabled {
@@ -388,7 +389,7 @@
 .Z_stat_number {
   font-size: 2rem;
   font-weight: bold;
-  color: #8e4fd8;
+  color: #6159a1;
   margin-bottom: 5px;
 }
 
@@ -510,7 +511,7 @@
 
 .Z_spinner {
   border: 3px solid #f3f3f3;
-  border-top: 3px solid #8e4fd8;
+  border-top: 3px solid #6159a1;
   border-radius: 50%;
   width: 30px;
   height: 30px;
@@ -549,4 +550,15 @@
 .Z_empty_message {
   font-size: 1rem;
   margin-bottom: 20px;
+}
+
+
+.Z_tech_badge {
+  background: #eee;
+  color: #333;
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin: 2px;
 }
