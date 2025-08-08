@@ -105,7 +105,7 @@ const Questions = () => {
   return (
     <Layout>
       <div className="Z_container">
-        <div className="Z_page_header"> 
+        <div className="Z_page_header">
           <h1 className="Z_page_title">Interview Questions Management</h1>
           <p className="Z_page_subtitle">
             Create, edit, and manage interview questions for your quiz platform
@@ -133,9 +133,13 @@ const Questions = () => {
           </div>
         </div>
 
-        <div className="row align-items-center mb-3 z_gap">
+        {/* Controls Row - All in One Line */}
+        <div className="row align-items-center mb-3 z_gap justify-content-between">
           <div className="col-md-3">
-            <button className="Z_add_new_btn w-100" onClick={() => navigate("/AddQuestion")}>
+            <button
+              className="Z_add_new_btn w-100"
+              onClick={() => navigate("/AddQuestion")}
+            >
               <FaPlus />
               Add New Question
             </button>
@@ -152,30 +156,91 @@ const Questions = () => {
               />
             </div>
           </div>
-          <div className="col-md-3">
-            <select
-              className="Z_filter_select w-100"
-              value={filterTechnology}
-              onChange={(e) => setFilterTechnology(e.target.value)}
-            >
-              {uniqueTechnologies.map((tech) => (
-                <option key={tech} value={tech}>
-                  {tech === "all" ? "All Technologies" : tech}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
 
+        <div className="z_technology-filters">
+          {[
+            'JavaScript',
+            'Python',
+            'Java',
+            'C++',
+            'Ruby',
+            'PHP',
+            'C#',
+            'Swift'
+          ]
+            .map((tech) => (
+              <div
+                key={tech}
+                className={`filter-box ${filterTechnology === tech ? 'active' : ''}`}
+                onClick={() => setFilterTechnology(tech)}
+              >
+                {filterTechnology === tech && <span className="z_check">✓</span>}
+                <span>{tech}</span>
+              </div>
+            ))}
+        </div>
+
+
+        {/* Questions Table */}
         <div className="Z_table_container">
           {loading ? (
             <div className="Z_loading">
               <div className="Z_spinner"></div>
               <p>Loading questions...</p>
             </div>
+          ) : filterTechnology === "Swift" ? (
+            <div className="Z_empty_state">
+              <svg
+                className="Z_empty_icon"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="12" cy="12" r="10" stroke="#999" strokeWidth="1.5" fill="#f5f5f5" />
+                <path
+                  d="M12 7.5c1.38 0 2.5 1.12 2.5 2.5 0 .98-.59 1.82-1.43 2.22-.37.18-.57.58-.57 1.03v.25"
+                  stroke="#999"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <circle cx="12" cy="17" r="1" fill="#999" />
+              </svg>
+
+              <h3 className="Z_empty_title">No Questions Available</h3>
+              <p className="Z_empty_message">No questions available for Swift technology</p>
+            </div>
+
           ) : filteredQuestions.length === 0 ? (
             <div className="Z_empty_state">
-              <div className="Z_empty_icon">📝</div>
+              <div className="Z_empty_icon">
+
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6 2a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6H6z"
+                    fill="#f5f5f5"
+                    stroke="#999"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M14 2v6h6"
+                    stroke="#999"
+                    strokeWidth="1.5"
+                    fill="none"
+                  />
+                  <line x1="8" y1="13" x2="16" y2="13" stroke="#999" strokeWidth="1.2" />
+                  <line x1="8" y1="16" x2="14" y2="16" stroke="#999" strokeWidth="1.2" />
+                </svg>
+              </div>
               <h3 className="Z_empty_title">No questions found</h3>
               <p className="Z_empty_message">
                 {searchTerm || filterTechnology !== "all"
@@ -184,7 +249,7 @@ const Questions = () => {
               </p>
             </div>
           ) : (
-            <table className="Z_table">
+            <table className="Z_table" style={{ tableLayout: "auto", width: "100%" }}>
               <thead className="Z_table_header">
                 <tr>
                   <th>Question</th>

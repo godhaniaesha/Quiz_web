@@ -93,12 +93,12 @@ const paginatedTechs = Array.isArray(techs)
         {error && <p className="error">{error}</p>}
 
         <div className="Z_table_container">
-          <table className="Z_table">
+          <table className="Z_table" style={{ tableLayout: "auto", width: "100%" }}>
             <thead className="Z_table_header">
               <tr>
                 <th>Technology Name</th>
                 <th>Status</th>
-                <th style={{ width: 120, textAlign: "center" }}>Actions</th>
+                <th className="text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="Z_table_body">

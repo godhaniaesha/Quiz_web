@@ -11,94 +11,86 @@ const Results = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
-const resultsData = [
-  {
-    id: 1,
-    email: "user1@example.com",
-    technology: ["JavaScript", "HTML",' CSS',' React',' Node.js',' Python',' PHP',' Java',' C#', ' C++',' Rust',' TypeScript',' Scala',' Perl',' Dart',' Haskell',' Elixir',' Lua', ' R', ' Objective-C'],
-    // technology: "JavaScript, HTML, CSS, React, Node.js, Python, PHP, Java, C#, C++",
-    score: 24,
-    timeTaken: "12m 30s",
-    status: "Pass",
-  },
-  {
-    id: 2,
-    email: "user2@example.com",
-    technology: ["React"],
-    score: 18,
-    timeTaken: "15m 10s",
-    status: "Fail",
-  },
-  {
-    id: 3,
-    email: "user3@example.com",
-    technology: ["CSS", "HTML"],
-    score: 27,
-    timeTaken: "10m 45s",
-    status: "Pass",
-  },
-  {
-    id: 4,
-    email: "user4@example.com",
-    technology: ["JavaScript"],
-    score: 22,
-    timeTaken: "13m 25s",
-    status: "Pass",
-  },
-  {
-    id: 5,
-    email: "user5@example.com",
-    technology: ["React", "JavaScript"],
-    score: 17,
-    timeTaken: "14m 50s",
-    status: "Fail",
-  },
-  {
-    id: 6,
-    email: "user6@example.com",
-    technology: ["HTML"],
-    score: 29,
-    timeTaken: "9m 30s",
-    status: "Pass",
-  }
-];
+  const resultsData = [
+    {
+      id: 1,
+      email: "user1@example.com",
+      technology: ["JavaScript", "HTML", ' CSS', ' React', ' Node.js', ' Python', ' PHP', ' Java', ' C#', ' C++', ' Rust', ' TypeScript', ' Scala', ' Perl', ' Dart', ' Haskell', ' Elixir', ' Lua', ' R', ' Objective-C'],
+      // technology: "JavaScript, HTML, CSS, React, Node.js, Python, PHP, Java, C#, C++",
+      score: 24,
+      timeTaken: "12m 30s",
+      status: "Pass",
+    },
+    {
+      id: 2,
+      email: "user2@example.com",
+      technology: ["React"],
+      score: 18,
+      timeTaken: "15m 10s",
+      status: "Fail",
+    },
+    {
+      id: 3,
+      email: "user3@example.com",
+      technology: ["CSS", "HTML"],
+      score: 27,
+      timeTaken: "10m 45s",
+      status: "Pass",
+    },
+    {
+      id: 4,
+      email: "user4@example.com",
+      technology: ["JavaScript"],
+      score: 22,
+      timeTaken: "13m 25s",
+      status: "Pass",
+    },
+    {
+      id: 5,
+      email: "user5@example.com",
+      technology: ["React", "JavaScript"],
+      score: 17,
+      timeTaken: "14m 50s",
+      status: "Fail",
+    },
+    {
+      id: 6,
+      email: "user6@example.com",
+      technology: ["HTML"],
+      score: 29,
+      timeTaken: "9m 30s",
+      status: "Pass",
+    }
+  ];
 
 
   const technologies = ["all", "JavaScript", "React", "CSS", "HTML"];
 
   const filteredResults = resultsData.filter((result) => {
-  const emailMatch = result.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const emailMatch = result.email.toLowerCase().includes(searchTerm.toLowerCase());
 
-  const techMatch = result.technology.some(tech =>
-    tech.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    const techMatch = result.technology.some(tech =>
+      tech.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
-  const matchesSearch = emailMatch || techMatch;
+    const matchesSearch = emailMatch || techMatch;
 
-  const matchesTechnology =
-    filterTechnology === "all" || result.technology.includes(filterTechnology);
+    const matchesTechnology =
+      filterTechnology === "all" || result.technology.includes(filterTechnology);
 
-  return matchesSearch && matchesTechnology;
-});
+    return matchesSearch && matchesTechnology;
+  });
 
 
   const itemsPerPage = 5;
   const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
- const paginatedResults = filteredResults
-  .slice(startIndex, startIndex + itemsPerPage)
-  .map((result) => ({
-    ...result,
-    percentage: ((result.score / 30) * 100).toFixed(2) + "%",
-  }));
-
-
-  const getStatusColor = (status) => {
-    return {
-      color: status === "Pass" ? "#28a745" : "#dc3545",
-      fontWeight: "600"
-    };
-  };
+  const paginatedResults = filteredResults
+    .slice(startIndex, startIndex + itemsPerPage)
+    .map((result) => ({
+      ...result,
+      percentage: ((result.score / 30) * 100).toFixed(2) + "%",
+    }));
 
   return (
     <Layout>
@@ -160,8 +152,6 @@ const resultsData = [
                   <th>Score</th>
                   <th>Time Taken</th>
                   <th>Percentage</th>
-                  <th>Status</th>
-                 
                 </tr>
               </thead>
               <tbody className="Z_table_body">
@@ -169,16 +159,15 @@ const resultsData = [
                   <tr key={result.id}>
                     <td>{result.email}</td>
                     <td>
-  {result.technology.map((tech, index) => (
-    <span key={index} className="Z_tech_badge">{tech}</span>
-  ))}
-</td>
+                      {result.technology.map((tech, index) => (
+                        <span key={index} className="Z_tech_badge">{tech}</span>
+                      ))}
+                    </td>
 
                     <td>{result.score}/30</td>
                     <td>{result.timeTaken}</td>
                     <td>{result.percentage}</td>
-                    <td style={getStatusColor(result.status)}>{result.status}</td>
-                   
+
                   </tr>
                 ))}
               </tbody>

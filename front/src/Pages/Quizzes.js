@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import "../style/z_style.css";
 import Layout from "../component/Layout";
 import { useNavigate } from "react-router-dom";
+import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
+import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 
 const Quizzes = () => {
   const navigate = useNavigate();
@@ -114,32 +116,75 @@ const Quizzes = () => {
           ) : filteredQuizzes.length === 0 ? (
             <div className="Z_empty_state">No quizzes found</div>
           ) : (
-            <table className="Z_table">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Category</th>
-                  <th>Difficulty</th>
-                  <th>Questions</th>
-                  <th>Status</th>
-                  <th>Email</th>
-                  <th>Created</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedQuizzes.map((quiz) => (
-                  <tr key={quiz.id}>
-                    <td>{quiz.title}</td>
-                    <td>{quiz.category}</td>
-                    <td>{quiz.difficulty}</td>
-                    <td>{quiz.questionsCount}</td>
-                    <td>{quiz.status}</td>
-                    <td>{quiz.email}</td>
-                    <td>{new Date(quiz.createdDate).toLocaleDateString()}</td>
+            <div className="Z_table_wrapper">
+              <table className="Z_table" style={{ tableLayout: "auto", width: "100%" }}>
+                <thead className="Z_table_header">
+                  <tr>
+                    <th >Quiz Title</th>
+                    <th >Category</th>
+                    <th >Difficulty</th>
+                    <th >Questions</th>
+                    <th >Time Limit</th>
+                    <th >Status</th>
+                    <th >Participants</th>
+                    <th >Avg Score</th>
+                    <th >Last Modified</th>
+                    <th >Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="Z_table_body">
+                  {paginatedQuizzes.map((quiz) => (
+                    <tr key={quiz.id}>
+                      <td>
+                        <div>
+                          <div style={{ fontWeight: "600", marginBottom: "4px" }}>
+                            {quiz.title}
+                          </div>
+                          <div style={{ fontSize: "0.8rem", color: "#6c757d", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {quiz.description}
+                          </div>
+                        </div>
+                      </td>
+                      <td>{quiz.category}</td>
+                      <td style={getDifficultyColor(quiz.difficulty)}>
+                        {quiz.difficulty}
+                      </td>
+                      <td>{quiz.questionsCount}</td>
+                      <td>{quiz.timeLimit} min</td>
+                      <td>{getStatusBadge(quiz.status)}</td>
+                      <td>{quiz.totalParticipants.toLocaleString()}</td>
+                      <td>{quiz.avgScore}%</td>
+                      <td>{new Date(quiz.lastModified).toLocaleDateString()}</td>
+                      <td>
+                        <div className="Z_action_buttons">
+                          <button
+                            className="Z_btn Z_btn_primary"
+                            onClick={() => handleView(quiz.id)}
+                            title="View"
+                          >
+                            <FaEye />
+                          </button>
+                          <button
+                            className="Z_btn Z_btn_warning"
+                            onClick={() => handleEdit(quiz.id)}
+                            title="Edit"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            className="Z_btn Z_btn_danger"
+                            onClick={() => handleDelete(quiz.id)}
+                            title="Delete"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
