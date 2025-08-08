@@ -3,36 +3,33 @@ const Quiz = require('../model/quiz.model');
 // 1️⃣ Create new quiz
 const createQuiz = async (req, res) => {
     try {
-        const { email, tech_Id } = req.body;
+        const { email, tech_Id, questions } = req.body;
 
-        if (!email || !tech_Id || !Array.isArray(tech_Id)) {
-            return res.status(400).json({
-                success: false,
-                message: "Email and tech_Id array are required"
-            });
-        }
-
-        const quiz = await Quiz.create({ email, tech_Id });
-        res.status(201).json({
-            success: true,
-            message: "Quiz created successfully",
-            data: quiz
+        const newQuiz = await Quiz.create({
+            email,
+            tech_Id,
+            questions
         });
+
+        res.status(201).json({ message: 'Quiz created successfully', quiz: newQuiz });
     } catch (error) {
-        res.status(500).json({ success: false, message: "Error creating quiz", error: error.message });
+        console.error('Error creating quiz:', error.message);
+        res.status(500).json({ message: 'Failed to create quiz' });
     }
 };
+
 
 // 2️⃣ Get all quizzes
 const getAllQuizzes = async (req, res) => {
     try {
-        const quizzes = await Quiz.find().populate("tech_Id"); // Optional populate
-        res.status(200).json({
-            success: true,
-            data: quizzes
-        });
+        const quizzes = await Quiz.find()
+            .populate('tech_Id')
+            .populate('questions.question_id');
+
+        res.status(200).json(quizzes);
     } catch (error) {
-        res.status(500).json({ success: false, message: "Error fetching quizzes", error: error.message });
+        console.error('Error fetching quizzes:', error.message);
+        res.status(500).json({ message: 'Failed to fetch quizzes' });
     }
 };
 
@@ -40,18 +37,19 @@ const getAllQuizzes = async (req, res) => {
 const getQuizById = async (req, res) => {
     try {
         const { id } = req.params;
-        const quiz = await Quiz.findById(id).populate("tech_Id");
+
+        const quiz = await Quiz.findById(id)
+            .populate('tech_Id')
+            .populate('questions.question_id');
 
         if (!quiz) {
-            return res.status(404).json({ success: false, message: "Quiz not found" });
+            return res.status(404).json({ message: 'Quiz not found' });
         }
 
-        res.status(200).json({
-            success: true,
-            data: quiz
-        });
+        res.status(200).json(quiz);
     } catch (error) {
-        res.status(500).json({ success: false, message: "Error fetching quiz", error: error.message });
+        console.error('Error fetching quiz:', error.message);
+        res.status(500).json({ message: 'Failed to fetch quiz' });
     }
 };
 
@@ -59,25 +57,24 @@ const getQuizById = async (req, res) => {
 const updateQuiz = async (req, res) => {
     try {
         const { id } = req.params;
-        const { email, tech_Id, status } = req.body;
+        const updates = req.body;
 
-        const quiz = await Quiz.findByIdAndUpdate(
-            id,
-            { email, tech_Id, status },
-            { new: true }
-        );
+        updates['questions']?.forEach(q => {
+            q.updatedAt = new Date(); // update timestamp if question updated
+        });
 
-        if (!quiz) {
-            return res.status(404).json({ success: false, message: "Quiz not found" });
+        const updatedQuiz = await Quiz.findByIdAndUpdate(id, updates, { new: true })
+            .populate('tech_Id')
+            .populate('questions.question_id');
+
+        if (!updatedQuiz) {
+            return res.status(404).json({ message: 'Quiz not found' });
         }
 
-        res.status(200).json({
-            success: true,
-            message: "Quiz updated successfully",
-            data: quiz
-        });
+        res.status(200).json({ message: 'Quiz updated successfully', quiz: updatedQuiz });
     } catch (error) {
-        res.status(500).json({ success: false, message: "Error updating quiz", error: error.message });
+        console.error('Error updating quiz:', error.message);
+        res.status(500).json({ message: 'Failed to update quiz' });
     }
 };
 
@@ -85,18 +82,17 @@ const updateQuiz = async (req, res) => {
 const deleteQuiz = async (req, res) => {
     try {
         const { id } = req.params;
-        const deleted = await Quiz.findByIdAndDelete(id);
 
-        if (!deleted) {
-            return res.status(404).json({ success: false, message: "Quiz not found" });
+        const deletedQuiz = await Quiz.findByIdAndDelete(id);
+
+        if (!deletedQuiz) {
+            return res.status(404).json({ message: 'Quiz not found' });
         }
 
-        res.status(200).json({
-            success: true,
-            message: "Quiz deleted successfully"
-        });
+        res.status(200).json({ message: 'Quiz deleted successfully' });
     } catch (error) {
-        res.status(500).json({ success: false, message: "Error deleting quiz", error: error.message });
+        console.error('Error deleting quiz:', error.message);
+        res.status(500).json({ message: 'Failed to delete quiz' });
     }
 };
 

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {createRegisterUser, getAllRegisterUsers, getRegisterUserById, updateRegisterUser, deleteRegisterUser , loginRegisterUser} = require('../controller/register.controller');
+const {createRegisterUser, getAllRegisterUsers, getRegisterUserById, updateRegisterUser, deleteRegisterUser , loginRegisterUser, sendOTP, verifyPasswordResetOTP, resetPassword} = require('../controller/register.controller');
 const upload = require('../middleware/upload');
 
 
@@ -22,5 +22,12 @@ router.delete('/:id', deleteRegisterUser);
 
 // Login user
 router.post('/login', loginRegisterUser);
+
+// send otp
+router.post('/sendotp', sendOTP);
+
+router.post('/verifyotp', verifyPasswordResetOTP);
+
+router.post('/resetpass', resetPassword);
 
 module.exports = router;

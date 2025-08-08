@@ -45,6 +45,7 @@ app.use('/api/tech', routers.techRoutes);
 app.use('/api/question', routers.questionRoutes);
 app.use('/api/auth', routers.registerRoutes);
 app.use('/api/quiz', routers.quizRoutes);
+app.use('/api/user', routers.userRoutes);
 
 
  
