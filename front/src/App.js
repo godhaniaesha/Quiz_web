@@ -43,7 +43,7 @@ function App() {
         <Route path='/questions' element={<Questions />}></Route>
         <Route path='/results' element={<Results />}></Route>
         <Route path='/techn' element={<Technology />}></Route>
-        <Route path='/logout' element={<Logout />}></Route>             
+        <Route path='/logout' element={<Logout />}></Route>
 
 
 
@@ -52,13 +52,14 @@ function App() {
         <Route path='/Questions' element={<Questions />}></Route>
         <Route path='/Quizzes' element={<Quizzes />}></Route>
         <Route path='/AddQuestion' element={<AddQuestion />}></Route>
+        <Route path="/EditQuestion/:id" element={<AddQuestion />} />
         <Route path='/Profile' element={<Profile />}></Route>
         <Route path='/AdminLogin' element={<AdminLogin />}></Route>
         <Route path='/AdminRegister' element={<AdminRegister />}></Route>
         <Route path='/AdminForgotPassword' element={<AdminForgotPassword />}></Route>
         <Route path='/AdminVerifyOTP' element={<AdminVerifyOTP />}></Route>
         <Route path='/AdminResetPassword' element={<AdminResetPassword />}></Route>
-       
+
       </Routes>
     </BrowserRouter>
   );

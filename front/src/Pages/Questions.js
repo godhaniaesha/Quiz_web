@@ -1,130 +1,101 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaEye, FaEdit, FaTrash, FaPlus, FaSearch } from "react-icons/fa";
 import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import {
+  db_getAllQuestions,
+  db_deleteQuestion,
+  db_updateQuestion
+} from "../redux/slice/question.slice";
 import "../style/z_style.css";
 import Layout from "../component/Layout";
 
 const Questions = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { questions, loading } = useSelector((state) => state.ques);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [filterTechnology, setFilterTechnology] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [questionToDelete, setQuestionToDelete] = useState(null);
 
-  // Mock data for questions
-  const [questions, setQuestions] = useState([
-    {
-      id: 1,
-      question: "What is the difference between let, const, and var in JavaScript?",
-      technology: "JavaScript",
-      difficulty: "Medium",
-      status: "Active"
-    },
-    {
-      id: 2,
-      question: "Explain the concept of closures in JavaScript with examples.",
-      technology: "JavaScript",
-      difficulty: "Hard",
-      status: "Active"
-    },
-    {
-      id: 3,
-      question: "What are React hooks and how do they work?",
-      technology: "React",
-      difficulty: "Medium",
-      status: "Active"
-    },
-    {
-      id: 4,
-      question: "Describe the Virtual DOM in React and its benefits.",
-      technology: "React",
-      difficulty: "Medium",
-      status: "Draft"
-    },
-    {
-      id: 5,
-      question: "What is the difference between synchronous and asynchronous programming?",
-      technology: "Programming",
-      difficulty: "Easy",
-      status: "Active"
-    },
-    {
-      id: 6,
-      question: "Explain the concept of promises in JavaScript.",
-      technology: "JavaScript",
-      difficulty: "Medium",
-      status: "Inactive"
-    }
-  ]);
+  useEffect(() => {
+    dispatch(db_getAllQuestions());
+  }, [dispatch]);
 
-  const technologies = ["all", "JavaScript", "React", "Programming", "CSS", "HTML"];
-  const difficulties = ["all", "Easy", "Medium", "Hard"];
+  const uniqueTechnologies = [
+    "all",
+    ...new Set(questions.map((q) => q.tech_Id?.name).filter(Boolean))
+  ];
 
-  // Filter and search questions
-  const filteredQuestions = questions.filter(question => {
-    const matchesSearch = question.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      question.technology.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTechnology = filterTechnology === "all" || question.technology === filterTechnology;
+  const filteredQuestions = questions.filter((q) => {
+    const matchesSearch =
+      q.Question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      q.tech_Id?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesTechnology =
+      filterTechnology === "all" || q.tech_Id?.name === filterTechnology;
     return matchesSearch && matchesTechnology;
   });
 
-  // Pagination
   const itemsPerPage = 5;
   const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedQuestions = filteredQuestions.slice(startIndex, startIndex + itemsPerPage);
 
   const handleEdit = (id) => {
-    console.log("Edit question:", id);
-    // Add edit functionality
+    navigate(`/EditQuestion/${id}`);
   };
 
-  const handleDelete = (id) => {
-    console.log("Delete question:", id);
-    // Add delete functionality
+  const handleDeleteClick = (id) => {
+    setQuestionToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    if (questionToDelete) {
+      dispatch(db_deleteQuestion(questionToDelete));
+      setShowDeleteModal(false);
+      setQuestionToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setQuestionToDelete(null);
   };
 
   const handleView = (id) => {
     console.log("View question:", id);
-    // Add view functionality
   };
 
-  const handleStatusToggle = (id) => {
-    setQuestions(prevQuestions =>
-      prevQuestions.map(question =>
-        question.id === id
-          ? { ...question, status: question.status === "Active" ? "Inactive" : "Active" }
-          : question
-      )
-    );
+  const handleStatusToggle = (id, currentStatus) => {
+    dispatch(db_updateQuestion({ id, updatedData: { active: !currentStatus } }));
   };
 
-  const getStatusSwitch = (status, id) => {
-    const isActive = status === "Active";
-    return (
-      <div className="Z_status_switch_container">
-        <label className="Z_status_switch">
-          <input
-            type="checkbox"
-            checked={isActive}
-            onChange={() => handleStatusToggle(id)}
-            className="Z_status_switch_input"
-          />
-          <span className="Z_status_switch_slider"></span>
-        </label>
-        {/* <span className="Z_status_text">{status}</span> */}
-      </div>
-    );
-  };
+  const getStatusSwitch = (active, id) => (
+    <div className="Z_status_switch_container">
+      <label className="Z_status_switch">
+        <input
+          type="checkbox"
+          checked={active}
+          onChange={() => handleStatusToggle(id, active)}
+          className="Z_status_switch_input"
+        />
+        <span className="Z_status_switch_slider"></span>
+      </label>
+    </div>
+  );
 
   const getDifficultyColor = (difficulty) => {
-    switch (difficulty) {
-      case "Easy":
+    switch (difficulty.toLowerCase()) {
+      case "easy":
         return { color: "#28a745" };
-      case "Medium":
+      case "medium":
         return { color: "#ffc107" };
-      case "Hard":
+      case "hard":
         return { color: "#dc3545" };
       default:
         return { color: "#6c757d" };
@@ -134,39 +105,37 @@ const Questions = () => {
   return (
     <Layout>
       <div className="Z_container">
-        {/* Page Header */}
-        <div className="Z_page_header">
+        <div className="Z_page_header"> 
           <h1 className="Z_page_title">Interview Questions Management</h1>
-          <p className="Z_page_subtitle">Create, edit, and manage interview questions for your quiz platform</p>
+          <p className="Z_page_subtitle">
+            Create, edit, and manage interview questions for your quiz platform
+          </p>
         </div>
 
-        {/* Stats Cards */}
         <div className="Z_stats_container">
           <div className="Z_stat_card">
             <div className="Z_stat_number">{questions.length}</div>
             <div className="Z_stat_label">Total Questions</div>
           </div>
           <div className="Z_stat_card">
-            <div className="Z_stat_number">{questions.filter(q => q.status === "Active").length}</div>
+            <div className="Z_stat_number">{questions.filter((q) => q.active).length}</div>
             <div className="Z_stat_label">Active Questions</div>
           </div>
           <div className="Z_stat_card">
-            <div className="Z_stat_number">{questions.filter(q => q.status === "Draft").length}</div>
-            <div className="Z_stat_label">Draft Questions</div>
+            <div className="Z_stat_number">{questions.filter((q) => !q.active).length}</div>
+            <div className="Z_stat_label">Inactive Questions</div>
           </div>
           <div className="Z_stat_card">
-            <div className="Z_stat_number">{questions.filter(q => q.technology === "JavaScript").length}</div>
+            <div className="Z_stat_number">
+              {questions.filter((q) => q.tech_Id?.name === "JavaScript").length}
+            </div>
             <div className="Z_stat_label">JavaScript Questions</div>
           </div>
         </div>
 
-        {/* Controls Row - All in One Line */}
         <div className="row align-items-center mb-3 z_gap">
           <div className="col-md-3">
-            <button 
-              className="Z_add_new_btn w-100" 
-              onClick={() => navigate("/AddQuestion")}
-            >
+            <button className="Z_add_new_btn w-100" onClick={() => navigate("/AddQuestion")}>
               <FaPlus />
               Add New Question
             </button>
@@ -189,16 +158,15 @@ const Questions = () => {
               value={filterTechnology}
               onChange={(e) => setFilterTechnology(e.target.value)}
             >
-              {technologies.map(technology => (
-                <option key={technology} value={technology}>
-                  {technology === "all" ? "All Technologies" : technology}
+              {uniqueTechnologies.map((tech) => (
+                <option key={tech} value={tech}>
+                  {tech === "all" ? "All Technologies" : tech}
                 </option>
               ))}
             </select>
           </div>
         </div>
 
-        {/* Questions Table */}
         <div className="Z_table_container">
           {loading ? (
             <div className="Z_loading">
@@ -212,8 +180,7 @@ const Questions = () => {
               <p className="Z_empty_message">
                 {searchTerm || filterTechnology !== "all"
                   ? "Try adjusting your search or filter criteria"
-                  : "Get started by adding your first question"
-                }
+                  : "Get started by adding your first question"}
               </p>
             </div>
           ) : (
@@ -229,34 +196,42 @@ const Questions = () => {
               </thead>
               <tbody className="Z_table_body">
                 {paginatedQuestions.map((question) => (
-                  <tr key={question.id}>
+                  <tr key={question._id}>
                     <td>
-                      <div style={{ maxWidth: "400px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {question.question}
+                      <div
+                        style={{
+                          maxWidth: "400px",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap"
+                        }}
+                      >
+                        {question.Question}
                       </div>
                     </td>
-                    <td>{question.technology}</td>
+                    <td>{question.tech_Id?.name || "N/A"}</td>
                     <td style={getDifficultyColor(question.difficulty)}>
-                      {question.difficulty}
+                      {question.difficulty.charAt(0).toUpperCase() +
+                        question.difficulty.slice(1)}
                     </td>
-                    <td>{getStatusSwitch(question.status, question.id)}</td>
+                    <td>{getStatusSwitch(question.active, question._id)}</td>
                     <td>
                       <div className="Z_action_buttons">
                         <button
                           className="Z_btn Z_btn_primary"
-                          onClick={() => handleView(question.id)}
+                          onClick={() => handleView(question._id)}
                         >
                           <FaEye />
                         </button>
                         <button
                           className="Z_btn Z_btn_warning"
-                          onClick={() => handleEdit(question.id)}
+                          onClick={() => handleEdit(question._id)}
                         >
                           <FaEdit />
                         </button>
                         <button
                           className="Z_btn Z_btn_danger"
-                          onClick={() => handleDelete(question.id)}
+                          onClick={() => handleDeleteClick(question._id)}
                         >
                           <FaTrash />
                         </button>
@@ -269,7 +244,6 @@ const Questions = () => {
           )}
         </div>
 
-        {/* Pagination */}
         {totalPages > 1 && (
           <div className="Z_pagination">
             <button
@@ -279,17 +253,15 @@ const Questions = () => {
             >
               <FaAnglesLeft />
             </button>
-
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
-                className={`Z_pagination_btn ${currentPage === page ? 'Z_pagination_btn_active' : ''}`}
+                className={`Z_pagination_btn ${currentPage === page ? "Z_pagination_btn_active" : ""}`}
                 onClick={() => setCurrentPage(page)}
               >
                 {page}
               </button>
             ))}
-
             <button
               className="Z_pagination_btn"
               onClick={() => setCurrentPage(currentPage + 1)}
@@ -300,6 +272,24 @@ const Questions = () => {
           </div>
         )}
       </div>
+
+      {/* ✅ Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="Z_modal_overlay">
+          <div className="Z_modal">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete this question?</p>
+            <div className="Z_modal_actions">
+              <button className="Z_btn Z_btn_danger" onClick={confirmDelete}>
+                Yes, Delete
+              </button>
+              <button className="Z_btn Z_btn_secondary" onClick={cancelDelete}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };
