@@ -102,12 +102,12 @@ const Technology = () => {
           <p className="Z_page_subtitle">Create, edit, and manage technologies for your quiz platform.</p>
         </div>
         <div className="Z_table_container">
-          <table className="Z_table">
+          <table className="Z_table" style={{ tableLayout: "auto", width: "100%" }}>
             <thead className="Z_table_header">
               <tr>
                 <th>Technology Name</th>
                 <th>Status</th>
-                <th style={{ width: 120, textAlign: "center" }}>Actions</th>
+                <th className="text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="Z_table_body">
@@ -209,10 +209,10 @@ const Technology = () => {
                 </b>?
               </div>
               <div className="Z_modal_actions">
-                <button className="Z_btn Z_btn_secondary" onClick={cancelDelete}>
+                <button className="Z_btn Z_btn_cancel" onClick={cancelDelete}>
                   Cancel
                 </button>
-                <button className="Z_btn Z_btn_danger" onClick={confirmDelete}>
+                <button className="Z_btn Z_btn_delete" onClick={confirmDelete}>
                   Delete
                 </button>
               </div>

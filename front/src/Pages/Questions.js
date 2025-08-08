@@ -14,48 +14,264 @@ const Questions = () => {
 
   // Mock data for questions
   const [questions, setQuestions] = useState([
+    // JavaScript Questions
     {
       id: 1,
       question: "What is the difference between let, const, and var in JavaScript?",
       technology: "JavaScript",
-      difficulty: "Medium",
+      difficulty: "Easy",
       status: "Active"
     },
     {
       id: 2,
       question: "Explain the concept of closures in JavaScript with examples.",
       technology: "JavaScript",
-      difficulty: "Hard",
+      difficulty: "Medium",
       status: "Active"
     },
     {
       id: 3,
-      question: "What are React hooks and how do they work?",
-      technology: "React",
-      difficulty: "Medium",
+      question: "What is the event loop in JavaScript and how does it work?",
+      technology: "JavaScript",
+      difficulty: "Hard",
       status: "Active"
     },
     {
       id: 4,
-      question: "Describe the Virtual DOM in React and its benefits.",
-      technology: "React",
+      question: "Explain the difference between Promise and async/await.",
+      technology: "JavaScript",
       difficulty: "Medium",
-      status: "Draft"
+      status: "Active"
     },
     {
       id: 5,
-      question: "What is the difference between synchronous and asynchronous programming?",
-      technology: "Programming",
+      question: "What is hoisting in JavaScript and how does it work?",
+      technology: "JavaScript",
+      difficulty: "Easy",
+      status: "Active"
+    },
+
+    // Python Questions
+    {
+      id: 6,
+      question: "What is the difference between list and tuple in Python?",
+      technology: "Python",
       difficulty: "Easy",
       status: "Active"
     },
     {
-      id: 6,
-      question: "Explain the concept of promises in JavaScript.",
-      technology: "JavaScript",
+      id: 7,
+      question: "Explain Python decorators and their practical use cases.",
+      technology: "Python",
       difficulty: "Medium",
-      status: "Inactive"
-    }
+      status: "Active"
+    },
+    {
+      id: 8,
+      question: "What is metaclass in Python and how does it work?",
+      technology: "Python",
+      difficulty: "Hard",
+      status: "Active"
+    },
+    {
+      id: 9,
+      question: "Explain Python's garbage collection mechanism.",
+      technology: "Python",
+      difficulty: "Medium",
+      status: "Active"
+    },
+    {
+      id: 10,
+      question: "What is the difference between shallow copy and deep copy in Python?",
+      technology: "Python",
+      difficulty: "Easy",
+      status: "Active"
+    },
+
+    // Java Questions
+    {
+      id: 11,
+      question: "What is the difference between interface and abstract class in Java?",
+      technology: "Java",
+      difficulty: "Easy",
+      status: "Active"
+    },
+    {
+      id: 12,
+      question: "Explain Java's memory management and garbage collection.",
+      technology: "Java",
+      difficulty: "Medium",
+      status: "Active"
+    },
+    {
+      id: 13,
+      question: "What is the difference between synchronized and volatile in Java?",
+      technology: "Java",
+      difficulty: "Hard",
+      status: "Active"
+    },
+    {
+      id: 14,
+      question: "Explain Java's exception handling mechanism.",
+      technology: "Java",
+      difficulty: "Medium",
+      status: "Active"
+    },
+    {
+      id: 15,
+      question: "What is the difference between HashMap and TreeMap in Java?",
+      technology: "Java",
+      difficulty: "Easy",
+      status: "Active"
+    },
+
+    // C++ Questions
+    {
+      id: 16,
+      question: "What is the difference between stack and heap memory in C++?",
+      technology: "C++",
+      difficulty: "Easy",
+      status: "Active"
+    },
+    {
+      id: 17,
+      question: "Explain C++ templates and their practical use cases.",
+      technology: "C++",
+      difficulty: "Medium",
+      status: "Active"
+    },
+    {
+      id: 18,
+      question: "What is RAII in C++ and how does it work?",
+      technology: "C++",
+      difficulty: "Hard",
+      status: "Active"
+    },
+    {
+      id: 19,
+      question: "Explain C++ smart pointers and their advantages.",
+      technology: "C++",
+      difficulty: "Medium",
+      status: "Active"
+    },
+    {
+      id: 20,
+      question: "What is the difference between const and constexpr in C++?",
+      technology: "C++",
+      difficulty: "Easy",
+      status: "Active"
+    },
+
+    // Ruby Questions
+    {
+      id: 21,
+      question: "What is the difference between class and module in Ruby?",
+      technology: "Ruby",
+      difficulty: "Easy",
+      status: "Active"
+    },
+    {
+      id: 22,
+      question: "Explain Ruby's method_missing and its practical use cases.",
+      technology: "Ruby",
+      difficulty: "Medium",
+      status: "Active"
+    },
+    {
+      id: 23,
+      question: "What is Ruby's metaprogramming and how does it work?",
+      technology: "Ruby",
+      difficulty: "Hard",
+      status: "Active"
+    },
+    {
+      id: 24,
+      question: "Explain Ruby's block, proc, and lambda differences.",
+      technology: "Ruby",
+      difficulty: "Medium",
+      status: "Active"
+    },
+    {
+      id: 25,
+      question: "What is the difference between include and extend in Ruby?",
+      technology: "Ruby",
+      difficulty: "Easy",
+      status: "Active"
+    },
+
+    // PHP Questions
+    {
+      id: 26,
+      question: "What is the difference between require and include in PHP?",
+      technology: "PHP",
+      difficulty: "Easy",
+      status: "Active"
+    },
+    {
+      id: 27,
+      question: "Explain PHP's object-oriented programming concepts.",
+      technology: "PHP",
+      difficulty: "Medium",
+      status: "Active"
+    },
+    {
+      id: 28,
+      question: "What is the difference between session and cookie in PHP?",
+      technology: "PHP",
+      difficulty: "Hard",
+      status: "Active"
+    },
+    {
+      id: 29,
+      question: "Explain PHP's magic methods and their usage.",
+      technology: "PHP",
+      difficulty: "Medium",
+      status: "Active"
+    },
+    {
+      id: 30,
+      question: "What is the difference between POST and GET in PHP?",
+      technology: "PHP",
+      difficulty: "Easy",
+      status: "Active"
+    },
+
+    // C# Questions
+    {
+      id: 31,
+      question: "What is the difference between abstract and virtual in C#?",
+      technology: "C#",
+      difficulty: "Easy",
+      status: "Active"
+    },
+    {
+      id: 32,
+      question: "Explain C#'s LINQ and its practical use cases.",
+      technology: "C#",
+      difficulty: "Medium",
+      status: "Active"
+    },
+    {
+      id: 33,
+      question: "What is the difference between async and await in C#?",
+      technology: "C#",
+      difficulty: "Hard",
+      status: "Active"
+    },
+    {
+      id: 34,
+      question: "Explain C#'s garbage collection mechanism.",
+      technology: "C#",
+      difficulty: "Medium",
+      status: "Active"
+    },
+    {
+      id: 35,
+      question: "What is the difference between struct and class in C#?",
+      technology: "C#",
+      difficulty: "Easy",
+      status: "Active"
+    },
   ]);
 
   const technologies = ["all", "JavaScript", "React", "Programming", "CSS", "HTML"];
@@ -161,10 +377,10 @@ const Questions = () => {
         </div>
 
         {/* Controls Row - All in One Line */}
-        <div className="row align-items-center mb-3 z_gap">
+        <div className="row align-items-center mb-3 z_gap justify-content-between">
           <div className="col-md-3">
-            <button 
-              className="Z_add_new_btn w-100" 
+            <button
+              className="Z_add_new_btn w-100"
               onClick={() => navigate("/AddQuestion")}
             >
               <FaPlus />
@@ -183,20 +399,31 @@ const Questions = () => {
               />
             </div>
           </div>
-          <div className="col-md-3">
-            <select
-              className="Z_filter_select w-100"
-              value={filterTechnology}
-              onChange={(e) => setFilterTechnology(e.target.value)}
-            >
-              {technologies.map(technology => (
-                <option key={technology} value={technology}>
-                  {technology === "all" ? "All Technologies" : technology}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
+
+        <div className="z_technology-filters">
+          {[
+            'JavaScript',
+            'Python',
+            'Java',
+            'C++',
+            'Ruby',
+            'PHP',
+            'C#',
+            'Swift'
+          ]
+            .map((tech) => (
+              <div
+                key={tech}
+                className={`filter-box ${filterTechnology === tech ? 'active' : ''}`}
+                onClick={() => setFilterTechnology(tech)}
+              >
+                {filterTechnology === tech && <span className="z_check">✓</span>}
+                <span>{tech}</span>
+              </div>
+            ))}
+        </div>
+
 
         {/* Questions Table */}
         <div className="Z_table_container">
@@ -205,9 +432,58 @@ const Questions = () => {
               <div className="Z_spinner"></div>
               <p>Loading questions...</p>
             </div>
+          ) : filterTechnology === "Swift" ? (
+            <div className="Z_empty_state">
+              <svg
+                className="Z_empty_icon"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="12" cy="12" r="10" stroke="#999" strokeWidth="1.5" fill="#f5f5f5" />
+                <path
+                  d="M12 7.5c1.38 0 2.5 1.12 2.5 2.5 0 .98-.59 1.82-1.43 2.22-.37.18-.57.58-.57 1.03v.25"
+                  stroke="#999"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <circle cx="12" cy="17" r="1" fill="#999" />
+              </svg>
+
+              <h3 className="Z_empty_title">No Questions Available</h3>
+              <p className="Z_empty_message">No questions available for Swift technology</p>
+            </div>
+
           ) : filteredQuestions.length === 0 ? (
             <div className="Z_empty_state">
-              <div className="Z_empty_icon">📝</div>
+              <div className="Z_empty_icon">
+
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6 2a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6H6z"
+                    fill="#f5f5f5"
+                    stroke="#999"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M14 2v6h6"
+                    stroke="#999"
+                    strokeWidth="1.5"
+                    fill="none"
+                  />
+                  <line x1="8" y1="13" x2="16" y2="13" stroke="#999" strokeWidth="1.2" />
+                  <line x1="8" y1="16" x2="14" y2="16" stroke="#999" strokeWidth="1.2" />
+                </svg>
+              </div>
               <h3 className="Z_empty_title">No questions found</h3>
               <p className="Z_empty_message">
                 {searchTerm || filterTechnology !== "all"
@@ -217,7 +493,7 @@ const Questions = () => {
               </p>
             </div>
           ) : (
-            <table className="Z_table">
+            <table className="Z_table" style={{ tableLayout: "auto", width: "100%" }}>
               <thead className="Z_table_header">
                 <tr>
                   <th>Question</th>

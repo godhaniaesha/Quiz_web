@@ -8,6 +8,51 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Technology Filter Styles */
+.z_technology-filters {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+  overflow-x: auto;
+  padding: 0 10px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.z_technology-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.z_technology-filters .filter-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f5f5f5;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  font-size: 14px;
+  color: #333;
+}
+
+.z_technology-filters .filter-box:hover {
+  background: #ebebeb;
+}
+
+.z_technology-filters .filter-box.active {
+  background: #f9f8ff;
+  color: #333;
+  border: 1px solid #865ce3;
+}
+
+.z_check {
+  color: #865ce3;
+  font-weight: bold;
+}
+
 .Z_page_header {
   background: #6159a1;
   color: white;
@@ -38,10 +83,18 @@
   margin-bottom: 30px;
 }
 
+.Z_table_wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+
 .Z_table {
   width: 100%;
+  min-width: 1200px;
   border-collapse: collapse;
   background: white;
+  table-layout: fixed;
 }
 
 .Z_table_header {
@@ -57,6 +110,9 @@
   text-wrap: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .Z_table_body tr {
@@ -72,6 +128,10 @@
   padding: 12px;
   font-size: 0.9rem;
   color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
 }
 
 .Z_table_body tr:nth-child(even) {
@@ -175,12 +235,14 @@
 /* Action Buttons */
 .Z_action_buttons {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 .Z_btn {
-  padding: 9px 12px;
+  padding: 8px 10px;
   border: 1px solid #dee2e6;
   border-radius: 6px;
   font-size: 0.8rem;
@@ -190,9 +252,12 @@
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   background: white;
   color: #6c757d;
+  min-width: 36px;
+  height: 36px;
 }
 
 .Z_btn svg {
@@ -411,11 +476,15 @@
   }
 
   .Z_table_container {
+    overflow: hidden;
+  }
+
+  .Z_table_wrapper {
     overflow-x: auto;
   }
 
   .Z_table {
-    min-width: 600px;
+    min-width: 1200px;
   }
 
   .Z_action_buttons {
@@ -475,6 +544,14 @@
     font-size: 1.25rem;
   }
 
+  .Z_table_wrapper {
+    overflow-x: auto;
+  }
+
+  .Z_table {
+    min-width: 1000px;
+  }
+
   .Z_table_header th,
   .Z_table_body td {
     padding: 8px 6px;
@@ -523,6 +600,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -552,7 +630,6 @@
   margin-bottom: 20px;
 }
 
-
 .Z_tech_badge {
   background: #eee;
   color: #333;
@@ -562,6 +639,7 @@
   display: inline-block;
   margin: 2px;
 }
+
 /* Modal Overlay and Box */
 .Z_modal_overlay {
   position: fixed;
@@ -575,6 +653,7 @@
   align-items: center;
   justify-content: center;
 }
+
 .Z_modal_box {
   background: #fff;
   border-radius: 10px;
@@ -584,19 +663,56 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   text-align: center;
 }
+
 .Z_modal_title {
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 12px;
+  color: #8e4fd8;
 }
+
 .Z_modal_body {
   margin-bottom: 20px;
   color: #333;
 }
+
 .Z_modal_actions {
   display: flex;
   gap: 16px;
   justify-content: center;
+}
+
+/* Modal Button Styles */
+.Z_btn_cancel {
+  background: white;
+  color: #8e4fd8;
+  border: 1px solid #8e4fd8;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.Z_btn_cancel:hover {
+  background: #f8f9fa;
+  border-color: #7a3fc4;
+  transform: translateY(-1px);
+}
+
+.Z_btn_delete {
+  background: linear-gradient(135deg, #8e4fd8 0%, #7a3fc4 100%);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.Z_btn_delete:hover {
+  background: linear-gradient(135deg, #9e5fe8 0%, #8a4fd4 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(142, 79, 216, 0.3);
 }
 
 /* Responsive for mobile */
@@ -605,12 +721,36 @@
     min-width: 90vw;
     padding: 18px 8px 12px 8px;
   }
+
   .Z_table_container {
     padding: 0 2px;
   }
+
   .Z_table th,
   .Z_table td {
     font-size: 0.95rem;
     padding: 8px 4px;
+  }
+}
+
+.Z_pagination_dots {
+  padding: 8px 12px;
+  color: #888;
+  font-size: 14px;
+}
+
+/* Responsive: Make pagination scrollable on small screens */
+@media (max-width: 576px) {
+  .Z_pagination {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px;
+    justify-content: flex-start;
+  }
+
+  .Z_pagination_btn {
+    flex: 0 0 auto;
+    font-size: 12px;
+    padding: 6px 10px;
   }
 }
