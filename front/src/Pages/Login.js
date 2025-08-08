@@ -6,7 +6,7 @@ export default function Login() {
        <div className="d_auth_wrap">
          <div className="d_auth_container">
             <div className="d_auth_card d_auth_card_login">
-                <img src={require('../Image/ki3.png')} alt="Logo" className="d_auth_logo" />
+                <img src={require('../Image/ki.png')} alt="Logo" className="d_auth_logo" />
                 {/* <h2 className="d_auth_title">Sign In</h2> */}
                 <p className="d_auth_subtitle">Ready to Begin? Enter Your Email!</p>
                 <form>

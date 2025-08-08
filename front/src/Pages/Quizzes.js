@@ -105,8 +105,8 @@ const Quizzes = () => {
   // Filter and search quizzes
   const filteredQuizzes = quizzes.filter(quiz => {
     const matchesSearch = quiz.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         quiz.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         quiz.category.toLowerCase().includes(searchTerm.toLowerCase());
+      quiz.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      quiz.category.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === "all" || quiz.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -165,185 +165,193 @@ const Quizzes = () => {
 
   return (
     <Layout>
-    <div className="Z_container">
-      {/* Page Header */}
-      <div className="Z_page_header">
-        <h1 className="Z_page_title">Quiz Management</h1>
-        <p className="Z_page_subtitle">Create, organize, and manage your interview quizzes</p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="Z_stats_container">
-        <div className="Z_stat_card">
-          <div className="Z_stat_number">{quizzes.length}</div>
-          <div className="Z_stat_label">Total Quizzes</div>
+      <div className="Z_container">
+        {/* Page Header */}
+        <div className="Z_page_header">
+          <h1 className="Z_page_title">Quiz Management</h1>
+          <p className="Z_page_subtitle">Create, organize, and manage your interview quizzes</p>
         </div>
-        <div className="Z_stat_card">
-          <div className="Z_stat_number">{quizzes.filter(q => q.status === "Active").length}</div>
-          <div className="Z_stat_label">Active Quizzes</div>
-        </div>
-        <div className="Z_stat_card">
-          <div className="Z_stat_number">{quizzes.reduce((acc, q) => acc + q.totalParticipants, 0).toLocaleString()}</div>
-          <div className="Z_stat_label">Total Participants</div>
-        </div>
-        <div className="Z_stat_card">
-          <div className="Z_stat_number">{Math.round(quizzes.reduce((acc, q) => acc + q.avgScore, 0) / quizzes.filter(q => q.avgScore > 0).length)}%</div>
-          <div className="Z_stat_label">Avg Score</div>
-        </div>
-      </div>
 
-      {/* Add New Button */}
-      <button className="Z_add_new_btn"
-      onClick={() => navigate("/register")}>
-        <span>+</span>
-        Create New Quiz
-      </button>
-
-      {/* Search and Filter */}
-      <div className="Z_search_filter">
-        <input
-          type="text"
-          placeholder="Search quizzes..."
-          className="Z_search_input"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <select
-          className="Z_filter_select"
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-        >
-          {statuses.map(status => (
-            <option key={status} value={status}>
-              {status === "all" ? "All Status" : status}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Quizzes Table */}
-      <div className="Z_table_container">
-        {loading ? (
-          <div className="Z_loading">
-            <div className="Z_spinner"></div>
-            <p>Loading quizzes...</p>
+        {/* Stats Cards */}
+        <div className="Z_stats_container">
+          <div className="Z_stat_card">
+            <div className="Z_stat_number">{quizzes.length}</div>
+            <div className="Z_stat_label">Total Quizzes</div>
           </div>
-        ) : filteredQuizzes.length === 0 ? (
-          <div className="Z_empty_state">
-            <div className="Z_empty_icon">📊</div>
-            <h3 className="Z_empty_title">No quizzes found</h3>
-            <p className="Z_empty_message">
-              {searchTerm || filterStatus !== "all" 
-                ? "Try adjusting your search or filter criteria"
-                : "Get started by creating your first quiz"
-              }
-            </p>
+          <div className="Z_stat_card">
+            <div className="Z_stat_number">{quizzes.filter(q => q.status === "Active").length}</div>
+            <div className="Z_stat_label">Active Quizzes</div>
           </div>
-        ) : (
-          <table className="Z_table">
-            <thead className="Z_table_header">
-              <tr>
-                <th>Quiz Title</th>
-                <th>Category</th>
-                <th>Difficulty</th>
-                <th>Questions</th>
-                <th>Time Limit</th>
-                <th>Status</th>
-                <th>Participants</th>
-                <th>Avg Score</th>
-                <th>Last Modified</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody className="Z_table_body">
-              {paginatedQuizzes.map((quiz) => (
-                <tr key={quiz.id}>
-                  <td>
-                    <div>
-                      <div style={{ fontWeight: "600", marginBottom: "4px" }}>
-                        {quiz.title}
-                      </div>
-                      <div style={{ fontSize: "0.8rem", color: "#6c757d", maxWidth: "250px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {quiz.description}
-                      </div>
-                    </div>
-                  </td>
-                  <td>{quiz.category}</td>
-                  <td style={getDifficultyColor(quiz.difficulty)}>
-                    {quiz.difficulty}
-                  </td>
-                  <td>{quiz.questionsCount}</td>
-                  <td>{quiz.timeLimit} min</td>
-                  <td>{getStatusBadge(quiz.status)}</td>
-                  <td>{quiz.totalParticipants.toLocaleString()}</td>
-                  <td>{quiz.avgScore}%</td>
-                  <td>{new Date(quiz.lastModified).toLocaleDateString()}</td>
-                  <td>
-                    <div className="Z_action_buttons">
-                      <button
-                        className="Z_btn Z_btn_primary"
-                        onClick={() => handleView(quiz.id)}
-                      >
-                        👁️ View
-                      </button>
-                      <button
-                        className="Z_btn Z_btn_warning"
-                        onClick={() => handleEdit(quiz.id)}
-                      >
-                        ✏️ Edit
-                      </button>
-                      <button
-                        className="Z_btn Z_btn_success"
-                        onClick={() => handleDuplicate(quiz.id)}
-                      >
-                        📋 Duplicate
-                      </button>
-                      <button
-                        className="Z_btn Z_btn_danger"
-                        onClick={() => handleDelete(quiz.id)}
-                      >
-                        🗑️ Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+          <div className="Z_stat_card">
+            <div className="Z_stat_number">{quizzes.reduce((acc, q) => acc + q.totalParticipants, 0).toLocaleString()}</div>
+            <div className="Z_stat_label">Total Participants</div>
+          </div>
+          <div className="Z_stat_card">
+            <div className="Z_stat_number">{Math.round(quizzes.reduce((acc, q) => acc + q.avgScore, 0) / quizzes.filter(q => q.avgScore > 0).length)}%</div>
+            <div className="Z_stat_label">Avg Score</div>
+          </div>
+        </div>
+
+        {/* Controls Row - All in One Line */}
+        <div className="row align-items-center mb-3 z_gap">
+          <div className="col-sm-auto">
+            {/* Add New Button */}
+            <button className="Z_add_new_btn w-100"
+              onClick={() => navigate("/register")}>
+              <span>+</span>
+              Create New Quiz
+            </button>
+          </div>
+          <div className="col">
+            <input
+              type="text"
+              placeholder="Search quizzes..."
+              className="Z_search_input w-100"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="col-sm-auto">
+            <select
+              className="Z_filter_select w-100"
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+            >
+              {statuses.map(status => (
+                <option key={status} value={status}>
+                  {status === "all" ? "All Status" : status}
+                </option>
               ))}
-            </tbody>
-          </table>
+            </select>
+          </div>
+        </div>
+
+
+
+
+        {/* Quizzes Table */}
+        <div className="Z_table_container">
+          {loading ? (
+            <div className="Z_loading">
+              <div className="Z_spinner"></div>
+              <p>Loading quizzes...</p>
+            </div>
+          ) : filteredQuizzes.length === 0 ? (
+            <div className="Z_empty_state">
+              <div className="Z_empty_icon">📊</div>
+              <h3 className="Z_empty_title">No quizzes found</h3>
+              <p className="Z_empty_message">
+                {searchTerm || filterStatus !== "all"
+                  ? "Try adjusting your search or filter criteria"
+                  : "Get started by creating your first quiz"
+                }
+              </p>
+            </div>
+          ) : (
+            <table className="Z_table">
+              <thead className="Z_table_header">
+                <tr>
+                  <th>Quiz Title</th>
+                  <th>Category</th>
+                  <th>Difficulty</th>
+                  <th>Questions</th>
+                  <th>Time Limit</th>
+                  <th>Status</th>
+                  <th>Participants</th>
+                  <th>Avg Score</th>
+                  <th>Last Modified</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody className="Z_table_body">
+                {paginatedQuizzes.map((quiz) => (
+                  <tr key={quiz.id}>
+                    <td>
+                      <div>
+                        <div style={{ fontWeight: "600", marginBottom: "4px" }}>
+                          {quiz.title}
+                        </div>
+                        <div style={{ fontSize: "0.8rem", color: "#6c757d", maxWidth: "250px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {quiz.description}
+                        </div>
+                      </div>
+                    </td>
+                    <td>{quiz.category}</td>
+                    <td style={getDifficultyColor(quiz.difficulty)}>
+                      {quiz.difficulty}
+                    </td>
+                    <td>{quiz.questionsCount}</td>
+                    <td>{quiz.timeLimit} min</td>
+                    <td>{getStatusBadge(quiz.status)}</td>
+                    <td>{quiz.totalParticipants.toLocaleString()}</td>
+                    <td>{quiz.avgScore}%</td>
+                    <td>{new Date(quiz.lastModified).toLocaleDateString()}</td>
+                    <td>
+                      <div className="Z_action_buttons">
+                        <button
+                          className="Z_btn Z_btn_primary"
+                          onClick={() => handleView(quiz.id)}
+                        >
+                          👁️ View
+                        </button>
+                        <button
+                          className="Z_btn Z_btn_warning"
+                          onClick={() => handleEdit(quiz.id)}
+                        >
+                          ✏️ Edit
+                        </button>
+                        <button
+                          className="Z_btn Z_btn_success"
+                          onClick={() => handleDuplicate(quiz.id)}
+                        >
+                          📋 Duplicate
+                        </button>
+                        <button
+                          className="Z_btn Z_btn_danger"
+                          onClick={() => handleDelete(quiz.id)}
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="Z_pagination">
+            <button
+              className="Z_pagination_btn"
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              ← Previous
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <button
+                key={page}
+                className={`Z_pagination_btn ${currentPage === page ? 'Z_pagination_btn_active' : ''}`}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              className="Z_pagination_btn"
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next →
+            </button>
+          </div>
         )}
       </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="Z_pagination">
-          <button
-            className="Z_pagination_btn"
-            onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            ← Previous
-          </button>
-          
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-            <button
-              key={page}
-              className={`Z_pagination_btn ${currentPage === page ? 'Z_pagination_btn_active' : ''}`}
-              onClick={() => setCurrentPage(page)}
-            >
-              {page}
-            </button>
-          ))}
-          
-          <button
-            className="Z_pagination_btn"
-            onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next →
-          </button>
-        </div>
-      )}
-    </div>
     </Layout>
   );
 };

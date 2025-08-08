@@ -35,7 +35,7 @@ export default function Register() {
         <div className="d_auth_container">
           <div className="d_auth_card">
 
-            <img src={require('../Image/ki3.png')} alt="Logo" className="d_auth_logo" />
+            <img src={require('../Image/ki.png')} alt="Logo" className="d_auth_logo" />
             {/* <h2 className="d_auth_title">Create Account</h2> */}
             <form>
               <div className="d_auth_group">
