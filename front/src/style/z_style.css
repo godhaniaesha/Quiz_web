@@ -550,3 +550,56 @@
   font-size: 1rem;
   margin-bottom: 20px;
 }
+
+/* Modal Overlay and Box */
+.Z_modal_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.Z_modal_box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 32px 24px 24px 24px;
+  min-width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  text-align: center;
+}
+.Z_modal_title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.Z_modal_body {
+  margin-bottom: 20px;
+  color: #333;
+}
+.Z_modal_actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+/* Responsive for mobile */
+@media (max-width: 600px) {
+  .Z_modal_box {
+    min-width: 90vw;
+    padding: 18px 8px 12px 8px;
+  }
+  .Z_table_container {
+    padding: 0 2px;
+  }
+  .Z_table th,
+  .Z_table td {
+    font-size: 0.95rem;
+    padding: 8px 4px;
+  }
+}
