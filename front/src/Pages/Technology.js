@@ -1,106 +1,97 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchTechs,
+  createTech,
+  updateTech,
+  deleteTech,
+  toggleTechStatus,
+  resetCreateSuccess,
+  resetUpdateSuccess,
+} from "../redux/slice/tech.slice";
+
 import Layout from "../component/Layout";
-import { MdClose, MdOutlineEdit } from "react-icons/md";
-import { MdDeleteOutline } from "react-icons/md";
+import { MdClose, MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
+import { FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
 import "../style/z_style.css";
 
+const ITEMS_PER_PAGE = 5;
+
 const Technology = () => {
-  const [technologies, setTechnologies] = useState([
-    { id: 1, name: "JavaScript", status: "Active" },
-    { id: 2, name: "React", status: "Active" },
-    { id: 3, name: "Python", status: "Inactive" },
-  ]);
+  const dispatch = useDispatch();
+  const { techs, loading, error, createSuccess, updateSuccess } = useSelector(
+    state => state.tech
+  );
+
   const [showCreate, setShowCreate] = useState(false);
   const [newTech, setNewTech] = useState("");
   const [editId, setEditId] = useState(null);
   const [editName, setEditName] = useState("");
   const [deleteId, setDeleteId] = useState(null);
 
-  // Add new technology
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    dispatch(fetchTechs());
+  }, [dispatch, createSuccess, updateSuccess]);
+
+  useEffect(() => {
+    if (createSuccess) dispatch(resetCreateSuccess());
+    if (updateSuccess) dispatch(resetUpdateSuccess());
+  }, [createSuccess, updateSuccess, dispatch]);
+
   const handleCreate = () => {
-    if (
-      newTech.trim() &&
-      !technologies.some(
-        (t) => t.name.toLowerCase() === newTech.trim().toLowerCase()
-      )
-    ) {
-      setTechnologies([
-        ...technologies,
-        { id: Date.now(), name: newTech.trim(), status: "Active" },
-      ]);
+    if (newTech.trim()) {
+      const formData = new FormData();
+      formData.append("name", newTech.trim());
+      dispatch(createTech(formData));
       setNewTech("");
       setShowCreate(false);
     }
   };
 
-  // Edit technology
-  const handleEdit = (id, name) => {
-    setEditId(id);
-    setEditName(name);
-  };
   const handleEditSave = () => {
-    if (
-      editName.trim() &&
-      !technologies.some(
-        (t) =>
-          t.name.toLowerCase() === editName.trim().toLowerCase() &&
-          t.id !== editId
-      )
-    ) {
-      setTechnologies(
-        technologies.map((t) =>
-          t.id === editId ? { ...t, name: editName.trim() } : t
-        )
-      );
+    if (editName.trim()) {
+      const formData = new FormData();
+      formData.append("name", editName.trim());
+      dispatch(updateTech({ id: editId, formData }));
       setEditId(null);
       setEditName("");
     }
   };
 
-  // Status toggle
-  const handleStatusToggle = (id) => {
-    setTechnologies((prev) =>
-      prev.map((tech) =>
-        tech.id === id
-          ? { ...tech, status: tech.status === "Active" ? "Inactive" : "Active" }
-          : tech
-      )
-    );
-  };
-  const getStatusSwitch = (status, id) => {
-    const isActive = status === "Active";
-    return (
-      <div className="Z_status_switch_container">
-        <label className="Z_status_switch">
-          <input
-            type="checkbox"
-            checked={isActive}
-            onChange={() => handleStatusToggle(id)}
-            className="Z_status_switch_input"
-          />
-          <span className="Z_status_switch_slider"></span>
-        </label>
-      </div>
-    );
-  };
+  const handleStatusToggle = id => dispatch(toggleTechStatus(id));
 
-  // Delete technology
-  const handleDelete = (id) => {
-    setDeleteId(id);
-  };
   const confirmDelete = () => {
-    setTechnologies(technologies.filter((t) => t.id !== deleteId));
+    dispatch(deleteTech(deleteId));
     setDeleteId(null);
   };
+
   const cancelDelete = () => setDeleteId(null);
+
+const paginatedTechs = Array.isArray(techs)
+  ? [...techs].reverse()
+  : [...(techs.result || [])].reverse();
+
+  const totalPages = Math.ceil(paginatedTechs.length / ITEMS_PER_PAGE);
+  const visibleTechs = paginatedTechs.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <Layout>
       <div className="Z_container">
         <div className="Z_page_header">
           <h1 className="Z_page_title">Manage Technologies</h1>
-          <p className="Z_page_subtitle">Create, edit, and manage technologies for your quiz platform.</p>
+          <p className="Z_page_subtitle">
+            Create, edit, and manage technologies for your quiz platform.
+          </p>
         </div>
+
+        {loading && <p>Loading...</p>}
+        {error && <p className="error">{error}</p>}
+
         <div className="Z_table_container">
           <table className="Z_table">
             <thead className="Z_table_header">
@@ -111,17 +102,17 @@ const Technology = () => {
               </tr>
             </thead>
             <tbody className="Z_table_body">
-              {technologies.map((tech) => (
-                <tr key={tech.id}>
+              {visibleTechs.map(tech => (
+                <tr key={tech._id}>
                   <td>
-                    {editId === tech.id ? (
+                    {editId === tech._id ? (
                       <input
                         className="Z_search_input"
                         type="text"
                         value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
+                        onChange={e => setEditName(e.target.value)}
                         onBlur={handleEditSave}
-                        onKeyDown={(e) =>
+                        onKeyDown={e =>
                           e.key === "Enter" ? handleEditSave() : null
                         }
                         autoFocus
@@ -131,40 +122,65 @@ const Technology = () => {
                       tech.name
                     )}
                   </td>
-                  <td>{getStatusSwitch(tech.status, tech.id)}</td>
+                  <td>
+                    <div className="Z_status_switch_container">
+                      <label className="Z_status_switch">
+                        <input
+                          type="checkbox"
+                          checked={tech.active}
+                          onChange={() => handleStatusToggle(tech._id)}
+                          className="Z_status_switch_input"
+                        />
+                        <span className="Z_status_switch_slider"></span>
+                      </label>
+                    </div>
+                  </td>
                   <td style={{ textAlign: "center" }}>
-                    <div className="Z_action_buttons" style={{ justifyContent: "center" }}>
+                    <div
+                      className="Z_action_buttons"
+                      style={{ justifyContent: "center" }}
+                    >
                       <button
                         className="Z_btn Z_btn_warning"
-                        onClick={() => handleEdit(tech.id, tech.name)}
-                        style={{ minWidth: 36 }}
+                        onClick={() => {
+                          setEditId(tech._id);
+                          setEditName(tech.name);
+                        }}
                         title="Edit"
+                        style={{ minWidth: 36 }}
                       >
-                        <span role="img" aria-label="edit"><MdOutlineEdit size={18} /></span>
+                        <MdOutlineEdit size={18} />
                       </button>
                       <button
                         className="Z_btn Z_btn_danger"
-                        onClick={() => handleDelete(tech.id)}
-                        style={{ minWidth: 36 }}
+                        onClick={() => setDeleteId(tech._id)}
                         title="Delete"
+                        style={{ minWidth: 36 }}
                       >
-                        <span role="img" aria-label="delete"><MdDeleteOutline size={18} /></span>
+                        <MdDeleteOutline size={18} />
                       </button>
                     </div>
                   </td>
                 </tr>
               ))}
+
               {showCreate && (
                 <tr>
                   <td colSpan={3}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                      }}
+                    >
                       <input
                         className="Z_search_input"
                         type="text"
                         placeholder="Enter technology name"
                         value={newTech}
-                        onChange={(e) => setNewTech(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+                        onChange={e => setNewTech(e.target.value)}
+                        onKeyDown={e => e.key === "Enter" && handleCreate()}
                         autoFocus
                         style={{ flex: 1 }}
                       />
@@ -173,7 +189,11 @@ const Technology = () => {
                       </button>
                       <button
                         className="Z_btn Z_btn_secondary"
-                        style={{ fontWeight: "bold", fontSize: "1.1rem", padding: "9px 14px" }}
+                        style={{
+                          fontWeight: "bold",
+                          fontSize: "1.1rem",
+                          padding: "9px 14px",
+                        }}
                         onClick={() => {
                           setShowCreate(false);
                           setNewTech("");
@@ -188,31 +208,75 @@ const Technology = () => {
               )}
             </tbody>
           </table>
-          {/* Create Button below the table */}
+
           {!showCreate && (
-            <div style={{ marginTop: 8, marginBottom: 8, marginLeft: 8 }}>
-              <button className="Z_add_new_btn" onClick={() => setShowCreate(true)}>
+            <div style={{ margin: "8px" }}>
+              <button
+                className="Z_add_new_btn"
+                onClick={() => setShowCreate(true)}
+              >
                 + Create
               </button>
             </div>
           )}
         </div>
 
-        {/* Custom Delete Confirmation */}
-        {deleteId !== null && (
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="Z_pagination">
+            <button
+              className="Z_pagination_btn"
+              onClick={() => setCurrentPage(prev => prev - 1)}
+              disabled={currentPage === 1}
+            >
+              <FaAngleDoubleLeft />
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <button
+                key={page}
+                className={`Z_pagination_btn ${
+                  currentPage === page ? "Z_pagination_btn_active" : ""
+                }`}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              className="Z_pagination_btn"
+              onClick={() => setCurrentPage(prev => prev + 1)}
+              disabled={currentPage === totalPages}
+            >
+              <FaAngleDoubleRight />
+            </button>
+          </div>
+        )}
+
+        {/* Delete confirmation */}
+        {deleteId && (
           <div className="Z_modal_overlay">
             <div className="Z_modal_box">
               <div className="Z_modal_title">Delete Technology</div>
               <div className="Z_modal_body">
-                Are you sure you want to delete <b>
-                  {technologies.find((t) => t.id === deleteId)?.name}
-                </b>?
+                Are you sure you want to delete{" "}
+                <b>
+                  {techs.find(t => t._id === deleteId)?.name}
+                </b>
+                ?
               </div>
               <div className="Z_modal_actions">
-                <button className="Z_btn Z_btn_secondary" onClick={cancelDelete}>
+                <button
+                  className="Z_btn Z_btn_secondary"
+                  onClick={cancelDelete}
+                >
                   Cancel
                 </button>
-                <button className="Z_btn Z_btn_danger" onClick={confirmDelete}>
+                <button
+                  className="Z_btn Z_btn_danger"
+                  onClick={confirmDelete}
+                >
                   Delete
                 </button>
               </div>
