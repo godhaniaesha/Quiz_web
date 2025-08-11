@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
  
 const quizSchema = new mongoose.Schema({
+    quizId: {
+        type: String,
+        // default: () => uuidv4(), // Generates a unique string ID
+        unique: true
+    },
     email: {
         type: String,
         required: true,
@@ -24,7 +29,7 @@ const quizSchema = new mongoose.Schema({
         },
         user_answer: {
             type: String,
-            required: true // e.g., "A", "B", "C", "D"
+            required: false // e.g., "A", "B", "C", "D"
         },
         status: {
             type: String,

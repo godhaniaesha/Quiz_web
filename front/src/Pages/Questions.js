@@ -193,21 +193,18 @@ const Questions = () => {
             <div className="Z_empty_state">
               <svg
                 className="Z_empty_icon"
-                width="48"
-                height="48"
-                viewBox="0 0 24 24"
+                width="80"
+                height="80"
+                viewBox="0 0 80 80"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <circle cx="12" cy="12" r="10" stroke="#999" strokeWidth="1.5" fill="#f5f5f5" />
+                <circle cx="40" cy="40" r="40" fill="#f0f0f0" />
+                <circle cx="40" cy="30" r="14" fill="#ccc" />
                 <path
-                  d="M12 7.5c1.38 0 2.5 1.12 2.5 2.5 0 .98-.59 1.82-1.43 2.22-.37.18-.57.58-.57 1.03v.25"
-                  stroke="#999"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  fill="none"
+                  d="M20 64c0-11 9-20 20-20s20 9 20 20"
+                  fill="#ccc"
                 />
-                <circle cx="12" cy="17" r="1" fill="#999" />
               </svg>
 
               <h3 className="Z_empty_title">No Questions Available</h3>
