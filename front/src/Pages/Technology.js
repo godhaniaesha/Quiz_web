@@ -69,9 +69,9 @@ const Technology = () => {
 
   const cancelDelete = () => setDeleteId(null);
 
-const paginatedTechs = Array.isArray(techs)
-  ? [...techs].reverse()
-  : [...(techs.result || [])].reverse();
+  const paginatedTechs = Array.isArray(techs)
+    ? [...techs].reverse()
+    : [...(techs.result || [])].reverse();
 
   const totalPages = Math.ceil(paginatedTechs.length / ITEMS_PER_PAGE);
   const visibleTechs = paginatedTechs.slice(
@@ -223,29 +223,43 @@ const paginatedTechs = Array.isArray(techs)
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="Z_pagination">
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", marginTop: "16px" }}>
             <button
-              className="Z_pagination_btn"
+              style={{
+                border: "1px solid #ddd",
+                background: "white",
+                borderRadius: "8px",
+                width: "36px",
+                height: "36px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                opacity: currentPage === 1 ? 0.5 : 1
+              }}
               onClick={() => setCurrentPage(prev => prev - 1)}
               disabled={currentPage === 1}
             >
               <FaAngleDoubleLeft />
             </button>
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button
-                key={page}
-                className={`Z_pagination_btn ${
-                  currentPage === page ? "Z_pagination_btn_active" : ""
-                }`}
-                onClick={() => setCurrentPage(page)}
-              >
-                {page}
-              </button>
-            ))}
+            <span style={{ fontSize: "16px", fontWeight: "500" }}>
+              {currentPage} of {totalPages}
+            </span>
 
             <button
-              className="Z_pagination_btn"
+              style={{
+                border: "1px solid #ddd",
+                background: "white",
+                borderRadius: "8px",
+                width: "36px",
+                height: "36px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+                opacity: currentPage === totalPages ? 0.5 : 1
+              }}
               onClick={() => setCurrentPage(prev => prev + 1)}
               disabled={currentPage === totalPages}
             >
@@ -253,6 +267,7 @@ const paginatedTechs = Array.isArray(techs)
             </button>
           </div>
         )}
+
 
         {/* Delete confirmation */}
         {deleteId && (
