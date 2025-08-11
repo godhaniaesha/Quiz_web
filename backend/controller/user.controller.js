@@ -1,4 +1,6 @@
 const User = require('../model/user.model'); // Adjust path if needed
+const Question = require('../model/question.model');
+const Quiz = require('../model/quiz.model');
 
 const joinQuiz = async (req, res) => {
     try {
@@ -23,6 +25,137 @@ const joinQuiz = async (req, res) => {
     } catch (error) {
         console.error('Error in joinQuiz:', error.message);
         res.status(500).json({ message: 'Failed to join quiz' });
+    }
+};
+
+// Generate quiz with random questions from selected technologies
+exports.generateQuiz = async (req, res) => {
+    try {
+        const { email, tech_Ids } = req.body;
+
+        // Validate input
+        if (!email || !tech_Ids || !Array.isArray(tech_Ids) || tech_Ids.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email and at least one technology ID are required'
+            });
+        }
+
+        // Get 30 random questions from the selected technologies
+        const questions = await Question.aggregate([
+            { $match: { 
+                tech_Id: { $in: tech_Ids.map(id => mongoose.Types.ObjectId(id)) },
+                active: true
+            }},
+            { $sample: { size: 30 } }
+        ]);
+
+        if (questions.length < 30) {
+            return res.status(400).json({
+                success: false,
+                message: 'Not enough questions available for selected technologies'
+            });
+        }
+
+        // Create quiz with initial unattempted status for all questions
+        const quiz = new Quiz({
+            email,
+            tech_Id: tech_Ids,
+            questions: questions.map(q => ({
+                question_id: q._id,
+                user_answer: '',
+                status: 'unattempted'
+            }))
+        });
+
+        await quiz.save();
+
+        // Return quiz with questions
+        const populatedQuiz = await Quiz.findById(quiz._id)
+            .populate({
+                path: 'questions.question_id',
+                select: 'Question options difficulty'
+            })
+            .populate('tech_Id', 'name');
+
+        res.status(201).json({
+            success: true,
+            quiz: populatedQuiz,
+            startTime: new Date(),
+            message: 'Quiz generated successfully'
+        });
+
+    } catch (error) {
+        console.error('Error generating quiz:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error generating quiz',
+            error: error.message
+        });
+    }
+};
+
+// Submit quiz answers and calculate time
+exports.submitQuiz = async (req, res) => {
+    try {
+        const { quizId, answers, startTime } = req.body;
+
+        // Validate input
+        if (!quizId || !answers || !startTime) {
+            return res.status(400).json({
+                success: false,
+                message: 'Quiz ID, answers, and start time are required'
+            });
+        }
+
+        const quiz = await Quiz.findById(quizId).populate('questions.question_id');
+        if (!quiz) {
+            return res.status(404).json({
+                success: false,
+                message: 'Quiz not found'
+            });
+        }
+
+        // Calculate time taken
+        const endTime = new Date();
+        const timeTaken = (endTime - new Date(startTime)) / 1000; // in seconds
+
+        // Update answers and check correctness
+        let correctAnswers = 0;
+        quiz.questions = quiz.questions.map((q, index) => {
+            const userAnswer = answers[index];
+            const isCorrect = q.question_id.answer === userAnswer;
+            if (isCorrect) correctAnswers++;
+
+            return {
+                ...q,
+                user_answer: userAnswer,
+                status: isCorrect ? 'correct' : 'incorrect',
+                updatedAt: endTime
+            };
+        });
+
+        quiz.status = 'inactive'; // Mark quiz as completed
+        await quiz.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Quiz submitted successfully',
+            result: {
+                totalQuestions: 30,
+                correctAnswers,
+                timeTaken,
+                score: (correctAnswers / 30) * 100
+            }
+        });
+
+    } catch (error) {
+        console.error('Error submitting quiz:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error submitting quiz',
+            error: error.message
+        });
     }
 };
 

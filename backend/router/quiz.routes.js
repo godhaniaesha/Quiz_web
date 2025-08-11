@@ -1,7 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const { createQuiz, getAllQuizzes, getQuizById, updateQuiz, deleteQuiz } = require('../controller/quiz.controller');
+const { 
+    createQuiz, 
+    getAllQuizzes, 
+    getQuizById, 
+    updateQuiz, 
+    deleteQuiz,
+    generateQuiz,
+    submitQuiz
+} = require('../controller/quiz.controller');
 
+router.post('/generate', generateQuiz);
+router.post('/submit', submitQuiz);
 
 router.post('/', createQuiz);
 router.get('/', getAllQuizzes);
