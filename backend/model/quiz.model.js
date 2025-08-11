@@ -1,11 +1,7 @@
 const mongoose = require('mongoose');
  
 const quizSchema = new mongoose.Schema({
-    quizId: {
-        type: String,
-        // default: () => uuidv4(), // Generates a unique string ID
-        unique: true
-    },
+    
     email: {
         type: String,
         required: true,

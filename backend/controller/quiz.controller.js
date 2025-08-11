@@ -6,9 +6,7 @@ const mongoose = require('mongoose');
 const generateQuiz = async (req, res) => {
     try {
         const { email, tech_Id } = req.body;
-        console.log(email, tech_Id, "jjjjjjjjj");
 
-        // Validate input
         if (!email || !tech_Id || !Array.isArray(tech_Id) || tech_Id.length === 0) {
             return res.status(400).json({
                 success: false,
@@ -16,64 +14,56 @@ const generateQuiz = async (req, res) => {
             });
         }
 
-        const quizzes = [];
+        // Get total available questions for given techs
+        const questionCount = await Question.countDocuments({
+            tech_Id: { $in: tech_Id.map(id => new mongoose.Types.ObjectId(id)) },
+            active: true
+        });
 
-        // Generate separate quiz for each technology
-        for (const techId of tech_Id) {
-            // First, count available questions
-            const questionCount = await Question.countDocuments({
-                tech_Id: new mongoose.Types.ObjectId(techId),
-                active: true
+        const questionSize = Math.min(30, questionCount);
+
+        if (questionSize === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'No questions available for selected technologies'
             });
-
-            // Get all available questions if less than 30, otherwise get 30
-            const questionSize = Math.min(30, questionCount);
-
-            if (questionSize === 0) {
-                return res.status(400).json({
-                    success: false,
-                    message: `No questions available for technology ID: ${techId}`
-                });
-            }
-
-            // Get random questions
-            const questions = await Question.aggregate([
-                {
-                    $match: {
-                        tech_Id: new mongoose.Types.ObjectId(techId),
-                        active: true
-                    }
-                },
-                { $sample: { size: questionSize } }
-            ]);
-
-            // Create quiz for this technology
-            const quiz = new Quiz({
-                email,
-                tech_Id: [techId],
-                questions: questions.map(q => ({
-                    question_id: q._id,
-                    user_answer: '',
-                    status: 'unattempted'
-                }))
-            });
-
-            await quiz.save();
-
-            // Populate quiz details
-            const populatedQuiz = await Quiz.findById(quiz._id)
-                .populate({
-                    path: 'questions.question_id',
-                    select: 'Question options difficulty'
-                })
-                .populate('tech_Id', 'name');
-
-            quizzes.push(populatedQuiz);
         }
+
+        // Pick 30 random questions from all selected techs
+        const questions = await Question.aggregate([
+            {
+                $match: {
+                    tech_Id: { $in: tech_Id.map(id => new mongoose.Types.ObjectId(id)) },
+                    active: true
+                }
+            },
+            { $sample: { size: questionSize } }
+        ]);
+
+        // Create quiz document
+        const quiz = new Quiz({
+            email,
+            tech_Id,
+            questions: questions.map(q => ({
+                question_id: q._id,
+                user_answer: '',
+                status: 'unattempted'
+            }))
+        });
+
+        await quiz.save();
+
+        // Populate quiz
+        const populatedQuiz = await Quiz.findById(quiz._id)
+            .populate({
+                path: 'questions.question_id',
+                select: 'Question options difficulty'
+            })
+            .populate('tech_Id', 'name');
 
         res.status(201).json({
             success: true,
-            quizzes: quizzes,
+            quizzes: [populatedQuiz],
             startTime: new Date(),
             message: 'Quizzes generated successfully'
         });
@@ -87,6 +77,8 @@ const generateQuiz = async (req, res) => {
         });
     }
 };
+
+
 
 // Submit quiz answers and calculate time
 const submitQuiz = async (req, res) => {
