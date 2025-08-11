@@ -15,7 +15,7 @@ router.get('/', getAllRegisterUsers);
 router.get('/:id', getRegisterUserById);
 
 // Update question by ID
-router.put('/:id', updateRegisterUser);
+router.put('/:id',upload.single("profileImage"), updateRegisterUser);
 
 // Delete question by ID
 router.delete('/:id', deleteRegisterUser);

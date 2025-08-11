@@ -39,7 +39,7 @@ export default function Main() {
         <div className="sidebar-overlay" onClick={handleOverlayClick}></div>
       )}
       <Header toggleSidebar={toggleSidebar} />
-      <div className="main-content w-100">
+      <div className="w-100">
         <Dashboard></Dashboard>
       </div>
     </div>

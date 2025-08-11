@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import '../style/d_style.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
+import { db_resetPassword } from '../redux/slice/auth.slice';
+import { toast } from 'react-toastify';
 
 export default function AdminResetPassword() {
   const [newPassword, setNewPassword] = useState('');
@@ -10,21 +13,42 @@ export default function AdminResetPassword() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const toggleNewPassword = () => setShowNewPassword(!showNewPassword);
-  const toggleConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
+  const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/;
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!newPassword || !confirmPassword) {
       setError('All fields are required');
-    } else if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters');
-    } else if (newPassword !== confirmPassword) {
+      return;
+    }
+
+    if (!passwordRegex.test(newPassword)) {
+      setError('Password must be at least 6 characters, include uppercase, lowercase, number, and special character');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
       setError('Passwords do not match');
-    } else {
-      const email = localStorage.getItem('db_admin_forgot_email');
-      console.log('Password reset for:', email);
+      return;
+    }
+
+    const phone_number = localStorage.getItem('db_admin_forgot_phone');
+
+    if (!phone_number) {
+      toast.error('Phone number not found. Please try again.');
+      return;
+    }
+
+    try {
+      const res = await dispatch(db_resetPassword({ phone_number, newPassword })).unwrap();
+      toast.success(res.message || 'Password reset successful');
+      localStorage.removeItem('db_admin_forgot_phone');
       window.location.href = '/AdminLogin';
+    } catch (err) {
+      toast.error(err.message || 'Failed to reset password');
     }
   };
 
@@ -32,12 +56,9 @@ export default function AdminResetPassword() {
     <div className="d_auth_wrap">
       <div className="d_auth_container">
         <div className="d_auth_card">
-            <img src={require('../Image/ki.png')} alt="Logo" className="d_auth_logo" />
-                 <p className="d_auth_subtitle fs-5">Reset Password</p>
-        
+          <img src={require('../Image/ki.png')} alt="Logo" className="d_auth_logo" />
+          <p className="d_auth_subtitle fs-5">Reset Password</p>
           <form onSubmit={handleSubmit}>
-
-            {/* New Password Field */}
             <div className="d_auth_group position-relative">
               <label className="d_auth_label">New Password</label>
               <input
@@ -50,12 +71,11 @@ export default function AdminResetPassword() {
                   setError('');
                 }}
               />
-              <span className="d_auth_toggle_icon" onClick={toggleNewPassword}>
+              <span className="d_auth_toggle_icon" onClick={() => setShowNewPassword(!showNewPassword)}>
                 {showNewPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
 
-            {/* Confirm Password Field */}
             <div className="d_auth_group position-relative mt-3">
               <label className="d_auth_label">Confirm Password</label>
               <input
@@ -68,7 +88,7 @@ export default function AdminResetPassword() {
                   setError('');
                 }}
               />
-              <span className="d_auth_toggle_icon" onClick={toggleConfirmPassword}>
+              <span className="d_auth_toggle_icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                 {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
               {error && <small className="d_auth_error">{error}</small>}

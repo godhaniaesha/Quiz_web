@@ -1,8 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../style/d_style.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+import { db_loginUser } from '../redux/slice/auth.slice'; // adjust path as needed
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function AdminLogin() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const { authUser, loading, error } = useSelector((state) => state.auth);
+
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -13,7 +23,7 @@ export default function AdminLogin() {
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
-        setErrors({ ...errors, [e.target.name]: '' }); // Clear error
+        setErrors({ ...errors, [e.target.name]: '' });
     };
 
     const validate = () => {
@@ -28,8 +38,11 @@ export default function AdminLogin() {
 
         if (!formData.password.trim()) {
             newErrors.password = 'Password is required';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
+        } else {
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/;
+            if (!passwordRegex.test(formData.password)) {
+                newErrors.password = 'Password must include uppercase, lowercase, number, and special character';
+            }
         }
 
         setErrors(newErrors);
@@ -39,10 +52,26 @@ export default function AdminLogin() {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (validate()) {
-            console.log('Login successful:', formData);
-            // Add API call or logic here
+            dispatch(db_loginUser(formData));
         }
     };
+
+    useEffect(() => {
+        if (authUser) {
+            // Save full user object and userId to localStorage
+            localStorage.setItem('user', JSON.stringify(authUser.data));
+            localStorage.setItem('userId', authUser.data?._id);
+
+            toast.success('Login successful!');
+            navigate('/');
+        }
+    }, [authUser, navigate]);
+
+    useEffect(() => {
+        if (error) {
+            toast.error(typeof error === 'string' ? error : 'Login failed. Try again.');
+        }
+    }, [error]);
 
     const togglePassword = () => {
         setShowPassword(!showPassword);
@@ -78,24 +107,35 @@ export default function AdminLogin() {
                                 className="d_auth_input"
                                 value={formData.password}
                                 onChange={handleChange}
+                                autoComplete="off"
                             />
                             <span className="d_auth_toggle_icon" onClick={togglePassword}>
                                 {showPassword ? <FaEyeSlash /> : <FaEye />}
                             </span>
                             {errors.password && <small className="d_auth_error">{errors.password}</small>}
-                        
                         </div>
 
-<div className="d-flex justify-content-end align-items-center mt-2">
- 
- <a href="/AdminForgotPassword" className=" small" style={{color:'#6159a1',textDecoration:'none'}}>Forgot Password?</a></div>
-                        <button type="submit" className="d_auth_btn mt-3">Sign In</button>
-                       
-<div className="d-flex justify-content-end align-items-center mt-2">
- 
-  <a href="/AdminLogin" className=" small" style={{color:'#6159a1',textDecoration:'none'}}>Already have an account?</a>
-</div>
+                        {error && (
+                            <div className="d_auth_error mt-2 text-danger text-center">
+                                {typeof error === 'string' ? error : 'Login failed. Try again.'}
+                            </div>
+                        )}
 
+                        <div className="d-flex justify-content-end align-items-center mt-2">
+                            <a href="/AdminForgotPassword" className="small" style={{ color: '#6159a1', textDecoration: 'none' }}>
+                                Forgot Password?
+                            </a>
+                        </div>
+
+                        <button type="submit" className="d_auth_btn mt-3" disabled={loading}>
+                            {loading ? 'Signing in...' : 'Sign In'}
+                        </button>
+
+                        <div className="d-flex justify-content-end align-items-center mt-2">
+                            <a href="/AdminRegister" className="small" style={{ color: '#6159a1', textDecoration: 'none' }}>
+                                Don’t have an account? Register
+                            </a>
+                        </div>
                     </form>
                 </div>
             </div>
