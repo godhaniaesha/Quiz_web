@@ -227,7 +227,7 @@ export default function Quiz() {
             <div className="d_quiz-wrapper d-flex justify-content-center align-items-center">
                 <div className="d_quiz-container ">
                     <div className="container">
-                        
+
                         <div className="d_result-card card mx-auto text-center p-4">
                             <div className="d_result-logo-wrapper mb-3">
                                 <img src={require('../Image/ki.png')} alt="Logo" className="d_quiz-logo mb-3" />

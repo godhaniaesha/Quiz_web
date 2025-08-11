@@ -7,6 +7,8 @@ import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { db_getAllQuizzes } from "../redux/slice/quiz.slice";
+import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEdit, FaEye, FaTrash } from "react-icons/fa";
+
 const Quizzes = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -265,35 +267,53 @@ const paginatedQuizzes = filteredQuizzes.slice(startIndex, startIndex + itemsPer
         </div>
 
         {/* Pagination */}
+        {/* Pagination */}
         {totalPages > 1 && (
-          <div className="Z_pagination">
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", marginTop: "16px" }}>
             <button
-              className="Z_pagination_btn"
-              onClick={() => setCurrentPage(currentPage - 1)}
+              style={{
+                border: "1px solid #ddd",
+                background: "white",
+                borderRadius: "8px",
+                width: "36px",
+                height: "36px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                opacity: currentPage === 1 ? 0.5 : 1
+              }}
+              onClick={() => setCurrentPage(prev => prev - 1)}
               disabled={currentPage === 1}
             >
-              <FaAnglesLeft />
+              <FaAngleDoubleLeft />
             </button>
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button
-                key={page}
-                className={`Z_pagination_btn ${currentPage === page ? 'Z_pagination_btn_active' : ''}`}
-                onClick={() => setCurrentPage(page)}
-              >
-                {page}
-              </button>
-            ))}
+            <span style={{ fontSize: "16px", fontWeight: "500" }}>
+              {currentPage} of {totalPages}
+            </span>
 
             <button
-              className="Z_pagination_btn"
-              onClick={() => setCurrentPage(currentPage + 1)}
+              style={{
+                border: "1px solid #ddd",
+                background: "white",
+                borderRadius: "8px",
+                width: "36px",
+                height: "36px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+                opacity: currentPage === totalPages ? 0.5 : 1
+              }}
+              onClick={() => setCurrentPage(prev => prev + 1)}
               disabled={currentPage === totalPages}
             >
-              <FaAnglesRight />
+              <FaAngleDoubleRight />
             </button>
           </div>
         )}
+
       </div>
     </Layout>
   );

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaEye, FaEdit, FaTrash, FaPlus, FaSearch } from "react-icons/fa";
+import { FaEye, FaEdit, FaTrash, FaPlus, FaSearch, FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
 import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import {
 } from "../redux/slice/question.slice";
 import "../style/z_style.css";
 import Layout from "../component/Layout";
+import { fetchTechs } from "../redux/slice/tech.slice";
 
 const Questions = () => {
   const navigate = useNavigate();
@@ -21,9 +22,12 @@ const Questions = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [questionToDelete, setQuestionToDelete] = useState(null);
+  const { techs } = useSelector((state) => state.tech);
+
 
   useEffect(() => {
     dispatch(db_getAllQuestions());
+    dispatch(fetchTechs())
   }, [dispatch]);
 
   const uniqueTechnologies = [
@@ -159,26 +163,16 @@ const Questions = () => {
         </div>
 
         <div className="z_technology-filters">
-          {[
-            'JavaScript',
-            'Python',
-            'Java',
-            'C++',
-            'Ruby',
-            'PHP',
-            'C#',
-            'Swift'
-          ]
-            .map((tech) => (
-              <div
-                key={tech}
-                className={`filter-box ${filterTechnology === tech ? 'active' : ''}`}
-                onClick={() => setFilterTechnology(tech)}
-              >
-                {filterTechnology === tech && <span className="z_check">✓</span>}
-                <span>{tech}</span>
-              </div>
-            ))}
+          {techs?.map((tech) => (
+            <div
+              key={tech._id}
+              className={`filter-box ${filterTechnology === tech.name ? 'active' : ''}`}
+              onClick={() => setFilterTechnology(tech.name)}
+            >
+              {filterTechnology === tech.name && <span className="z_check">✓</span>}
+              <span>{tech.name}</span>
+            </div>
+          ))}
         </div>
 
 
@@ -306,33 +300,53 @@ const Questions = () => {
           )}
         </div>
 
+        {/* Pagination */}
         {totalPages > 1 && (
-          <div className="Z_pagination">
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", marginTop: "16px" }}>
             <button
-              className="Z_pagination_btn"
-              onClick={() => setCurrentPage(currentPage - 1)}
+              style={{
+                border: "1px solid #ddd",
+                background: "white",
+                borderRadius: "8px",
+                width: "36px",
+                height: "36px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                opacity: currentPage === 1 ? 0.5 : 1
+              }}
+              onClick={() => setCurrentPage(prev => prev - 1)}
               disabled={currentPage === 1}
             >
-              <FaAnglesLeft />
+              <FaAngleDoubleLeft />
             </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                className={`Z_pagination_btn ${currentPage === page ? "Z_pagination_btn_active" : ""}`}
-                onClick={() => setCurrentPage(page)}
-              >
-                {page}
-              </button>
-            ))}
+
+            <span style={{ fontSize: "16px", fontWeight: "500" }}>
+              {currentPage} of {totalPages}
+            </span>
+
             <button
-              className="Z_pagination_btn"
-              onClick={() => setCurrentPage(currentPage + 1)}
+              style={{
+                border: "1px solid #ddd",
+                background: "white",
+                borderRadius: "8px",
+                width: "36px",
+                height: "36px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+                opacity: currentPage === totalPages ? 0.5 : 1
+              }}
+              onClick={() => setCurrentPage(prev => prev + 1)}
               disabled={currentPage === totalPages}
             >
-              <FaAnglesRight />
+              <FaAngleDoubleRight />
             </button>
           </div>
         )}
+
       </div>
 
       {/* ✅ Delete Confirmation Modal */}
