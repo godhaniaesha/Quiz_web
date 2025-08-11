@@ -188,7 +188,7 @@
 }
 .d_custom_checkbox_group::-webkit-scrollbar-thumb,
 .d_selected_tags::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(73, 65, 65, 0.2);
   border-radius: 4px;
 }
 

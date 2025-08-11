@@ -1,50 +1,131 @@
-import React, { useState } from 'react';
-import '../style/d_style.css';
-import Layout from '../component/Layout';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "../style/d_style.css";
+import Layout from "../component/Layout";
+import { fetchTechs } from "../redux/slice/tech.slice";
+import { db_generateQuiz } from "../redux/slice/quiz.slice";
 
 export default function Register() {
-  const [selectedTech, setSelectedTech] = useState([]);
-  const [searchText, setSearchText] = useState('');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const techLanguages = [
-    'JavaScript', 'Python', 'Java', 'C++', 'Ruby', 'PHP',
-    'C#', 'Swift', 'Go', 'Kotlin', 'Rust', 'TypeScript',
-    'Scala', 'Perl', 'Dart', 'Haskell', 'Elixir', 'Lua',
-    'R', 'Objective-C'
-  ];
+  const { techs, loading: techLoading, error: techError } = useSelector(
+    (state) => state.tech || {}
+  );
+  const { loading: quizLoading, error: quizError, result } = useSelector(
+    (state) => state.quiz || {}
+  );
+
+  const [selectedTech, setSelectedTech] = useState([]);
+  const [searchText, setSearchText] = useState("");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    dispatch(fetchTechs());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (quizError) {
+      toast.error(quizError);
+    }
+  }, [quizError]);
+
+useEffect(() => {
+  if (result && !quizLoading) {
+    toast.success("Quiz generated successfully!");
+    
+    // Reset form
+    setEmail("");
+    setSelectedTech([]);
+    setSearchText("");
+
+    // Redirect after short delay so toast is visible
+    setTimeout(() => {
+      navigate("/quizzes");
+    }, 1500);
+  }
+}, [result, quizLoading, navigate]);
 
   const handleCheckboxToggle = (lang) => {
-    setSelectedTech(prev =>
+    setSelectedTech((prev) =>
       prev.includes(lang)
-        ? prev.filter(item => item !== lang)
+        ? prev.filter((item) => item !== lang)
         : [...prev, lang]
     );
   };
 
   const handleRemoveSelected = (lang) => {
-    setSelectedTech(prev => prev.filter(item => item !== lang));
+    setSelectedTech((prev) => prev.filter((item) => item !== lang));
   };
 
-  const filteredLanguages = techLanguages.filter(lang =>
-    lang.toLowerCase().includes(searchText.toLowerCase())
+  const techLanguages =
+    Array.isArray(techs) && techs.length > 0
+      ? techs.map((t) => ({ id: t._id, name: t.name }))
+      : Array.isArray(techs?.result)
+      ? techs.result.map((t) => ({ id: t._id, name: t.name }))
+      : [];
+
+  const filteredLanguages = techLanguages.filter((t) =>
+    t.name?.toLowerCase().includes(searchText.toLowerCase())
   );
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!email) {
+      toast.warning("Please enter your email");
+      return;
+    }
+    if (selectedTech.length === 0) {
+      toast.warning("Please select at least one technology");
+      return;
+    }
+
+    const selectedIds = techLanguages
+      .filter((t) => selectedTech.includes(t.name))
+      .map((t) => t.id);
+
+    dispatch(
+      db_generateQuiz({
+        email,
+        tech_Id: selectedIds,
+      })
+    );
+  };
 
   return (
     <Layout>
+      <ToastContainer></ToastContainer>
       <div className="d_auth_wrap">
         <div className="d_auth_container">
           <div className="d_auth_card">
+            <img
+              src={require("../Image/ki.png")}
+              alt="Logo"
+              className="d_auth_logo"
+            />
 
-            <img src={require('../Image/ki.png')} alt="Logo" className="d_auth_logo" />
-            {/* <h2 className="d_auth_title">Create Account</h2> */}
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="d_auth_group">
                 <label className="d_auth_label">Email</label>
-                <input type="email" placeholder="Enter email" className="d_auth_input" />
+                <input
+                  type="email"
+                  placeholder="Enter email"
+                  className="d_auth_input"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
 
               <div className="d_auth_group mt-3">
                 <label className="d_auth_label">Select Tech Languages</label>
+
+                {techLoading && <p>Loading tech languages...</p>}
+                {techError && toast.error(techError)}
+
                 <input
                   type="text"
                   placeholder="Search tech..."
@@ -52,19 +133,22 @@ export default function Register() {
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                 />
+
                 <div className="d_custom_checkbox_group">
-                  {filteredLanguages.map(lang => {
-                    const isActive = selectedTech.includes(lang);
+                  {filteredLanguages.map((t) => {
+                    const isActive = selectedTech.includes(t.name);
                     return (
                       <div
-                        key={lang}
-                        className={`d_custom_checkbox_box ${isActive ? 'active' : ''}`}
-                        onClick={() => handleCheckboxToggle(lang)}
+                        key={t.id}
+                        className={`d_custom_checkbox_box ${
+                          isActive ? "active" : ""
+                        }`}
+                        onClick={() => handleCheckboxToggle(t.name)}
                       >
                         <span className="checkbox-indicator">
-                          {isActive ? '✔' : ''}
+                          {isActive ? "✔" : ""}
                         </span>
-                        <span>{lang}</span>
+                        <span>{t.name}</span>
                       </div>
                     );
                   })}
@@ -91,15 +175,26 @@ export default function Register() {
                 )}
               </div>
 
-              <button type="submit" className="d_auth_btn mt-4">Register</button>
+              <button
+                type="submit"
+                className="d_auth_btn mt-4"
+                disabled={quizLoading}
+              >
+                {quizLoading ? "Generating Quiz..." : "Generate Quiz"}
+              </button>
+
               <p className="d_auth_footer">
-                Already have an account? <a href="/login" className="text-info">Sign In</a>
+                Already have an account?{" "}
+                <a href="/login" className="text-info">
+                  Sign In
+                </a>
               </p>
             </form>
           </div>
         </div>
       </div>
-    </Layout>
 
+      
+    </Layout>
   );
 }

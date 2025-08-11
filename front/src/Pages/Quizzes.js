@@ -4,120 +4,29 @@ import Layout from "../component/Layout";
 import { useNavigate } from "react-router-dom";
 import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
-
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { db_getAllQuizzes } from "../redux/slice/quiz.slice";
 const Quizzes = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
+const dispatch = useDispatch();
+const { quizzes } = useSelector((state) => state.quiz);
 
+useEffect(() => {
+  dispatch(db_getAllQuizzes());
+}, [dispatch]);
   // Mock data for quizzes
-  const [quizzes] = useState([
-    {
-      id: 1,
-      title: "JavaScript Fundamentals",
-      description: "Test your knowledge of JavaScript basics including variables, functions, and DOM manipulation.",
-      category: "Programming",
-      difficulty: "Beginner",
-      questionsCount: 25,
-      timeLimit: 30,
-      status: "Active",
-      createdDate: "2024-01-15",
-      totalParticipants: 1250,
-      avgScore: 78,
-      lastModified: "2024-01-20"
-    },
-    {
-      id: 2,
-      title: "React Development",
-      description: "Advanced React concepts including hooks, context, and performance optimization.",
-      category: "Web Development",
-      difficulty: "Advanced",
-      questionsCount: 40,
-      timeLimit: 45,
-      status: "Active",
-      createdDate: "2024-01-10",
-      totalParticipants: 890,
-      avgScore: 65,
-      lastModified: "2024-01-18"
-    },
-    {
-      id: 3,
-      title: "CSS Layout Mastery",
-      description: "Master CSS Grid, Flexbox, and responsive design principles.",
-      category: "Web Development",
-      difficulty: "Intermediate",
-      questionsCount: 30,
-      timeLimit: 35,
-      status: "Active",
-      createdDate: "2024-01-12",
-      totalParticipants: 2100,
-      avgScore: 82,
-      lastModified: "2024-01-19"
-    },
-    {
-      id: 4,
-      title: "Data Structures & Algorithms",
-      description: "Test your understanding of fundamental data structures and algorithms.",
-      category: "Computer Science",
-      difficulty: "Advanced",
-      questionsCount: 50,
-      timeLimit: 60,
-      status: "Draft",
-      createdDate: "2024-01-08",
-      totalParticipants: 0,
-      avgScore: 0,
-      lastModified: "2024-01-15"
-    },
-    {
-      id: 5,
-      title: "HTML5 & Semantic Markup",
-      description: "Learn modern HTML5 features and semantic markup best practices.",
-      category: "Web Development",
-      difficulty: "Beginner",
-      questionsCount: 20,
-      timeLimit: 25,
-      status: "Active",
-      createdDate: "2024-01-05",
-      totalParticipants: 3200,
-      avgScore: 91,
-      lastModified: "2024-01-16"
-    },
-    {
-      id: 6,
-      title: "Node.js Backend Development",
-      description: "Server-side JavaScript with Node.js, Express, and database integration.",
-      category: "Backend Development",
-      difficulty: "Intermediate",
-      questionsCount: 35,
-      timeLimit: 40,
-      status: "Inactive",
-      createdDate: "2024-01-03",
-      totalParticipants: 750,
-      avgScore: 58,
-      lastModified: "2024-01-12"
-    }
-  ]);
 
   const categories = ["all", "Programming", "Web Development", "Computer Science", "Backend Development", "Frontend Development"];
   const difficulties = ["all", "Beginner", "Intermediate", "Advanced"];
   const statuses = ["all", "Active", "Inactive", "Draft"];
 
   // Filter and search quizzes
-  const filteredQuizzes = quizzes.filter(quiz => {
-    const matchesSearch = quiz.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      quiz.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      quiz.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === "all" || quiz.status === filterStatus;
-    return matchesSearch && matchesStatus;
-  });
 
-  // Pagination
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(filteredQuizzes.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedQuizzes = filteredQuizzes.slice(startIndex, startIndex + itemsPerPage);
 
   const handleEdit = (id) => {
     console.log("Edit quiz:", id);
@@ -164,7 +73,38 @@ const Quizzes = () => {
         return { color: "#6c757d" };
     }
   };
+// ...existing code...
+const mappedQuizzes = Array.isArray(quizzes)
+  ? quizzes.map((quiz) => ({
+      id: quiz._id,
+      title: quiz.tech_Id?.map(t => t.name).join(", ") || "N/A",
+      description: `Quiz for ${quiz.email}`,
+      category: quiz.tech_Id?.map(t => t.name).join(", ") || "N/A",
+      difficulty: "N/A", // If you have difficulty, map it here
+      questionsCount: quiz.questions?.length || 0,
+      timeLimit: 30, // Set if you have this info
+      status: quiz.status === "active" ? "Active" : quiz.status === "inactive" ? "Inactive" : "Draft",
+      createdDate: quiz.createdAt ? new Date(quiz.createdAt).toISOString().slice(0, 10) : "",
+      totalParticipants: 0, // Set if you have this info
+      avgScore: 0, // Set if you have this info
+      lastModified: quiz.updatedAt ? new Date(quiz.updatedAt).toISOString().slice(0, 10) : "",
+    }))
+  : [];
+  // ...existing code...
+const filteredQuizzes = mappedQuizzes.filter(quiz => {
+  const matchesSearch = quiz.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    quiz.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    quiz.category.toLowerCase().includes(searchTerm.toLowerCase());
+  const matchesStatus = filterStatus === "all" || quiz.status === filterStatus;
+  return matchesSearch && matchesStatus;
+});
 
+const itemsPerPage = 5;
+const totalPages = Math.ceil(filteredQuizzes.length / itemsPerPage);
+const startIndex = (currentPage - 1) * itemsPerPage;
+const paginatedQuizzes = filteredQuizzes.slice(startIndex, startIndex + itemsPerPage);
+// ...existing code...
+// ...existing code...
   return (
     <Layout>
       <div className="Z_container">
@@ -177,19 +117,19 @@ const Quizzes = () => {
         {/* Stats Cards */}
         <div className="Z_stats_container">
           <div className="Z_stat_card">
-            <div className="Z_stat_number">{quizzes.length}</div>
+            <div className="Z_stat_number">{mappedQuizzes.length}</div>
             <div className="Z_stat_label">Total Quizzes</div>
           </div>
           <div className="Z_stat_card">
-            <div className="Z_stat_number">{quizzes.filter(q => q.status === "Active").length}</div>
+            <div className="Z_stat_number">{mappedQuizzes.filter(q => q.status === "Active").length}</div>
             <div className="Z_stat_label">Active Quizzes</div>
           </div>
           <div className="Z_stat_card">
-            <div className="Z_stat_number">{quizzes.reduce((acc, q) => acc + q.totalParticipants, 0).toLocaleString()}</div>
+            <div className="Z_stat_number">{mappedQuizzes.reduce((acc, q) => acc + q.totalParticipants, 0).toLocaleString()}</div>
             <div className="Z_stat_label">Total Participants</div>
           </div>
           <div className="Z_stat_card">
-            <div className="Z_stat_number">{Math.round(quizzes.reduce((acc, q) => acc + q.avgScore, 0) / quizzes.filter(q => q.avgScore > 0).length)}%</div>
+            <div className="Z_stat_number">{Math.round(mappedQuizzes.reduce((acc, q) => acc + q.avgScore, 0) / quizzes.filter(q => q.avgScore > 0).length)}%</div>
             <div className="Z_stat_label">Avg Score</div>
           </div>
         </div>
@@ -268,6 +208,8 @@ const Quizzes = () => {
                 </thead>
                 <tbody className="Z_table_body">
                   {paginatedQuizzes.map((quiz) => (
+                    console.log('quiz', quiz),
+                    
                     <tr key={quiz.id}>
                       <td>
                         <div>
