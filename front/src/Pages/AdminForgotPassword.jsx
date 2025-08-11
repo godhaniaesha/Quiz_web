@@ -1,40 +1,48 @@
 import React, { useState } from 'react';
 import '../style/d_style.css';
+import { useDispatch } from 'react-redux';
+import { db_sendOTP } from '../redux/slice/auth.slice';
+import { toast } from 'react-toastify';
 
 export default function AdminForgotPassword() {
-  const [email, setEmail] = useState('');
+  const [phone_number, setPhoneNumber] = useState('');
   const [error, setError] = useState('');
+  const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email.trim()) {
-      setError('Email is required');
+
+    if (!phone_number.trim()) {
+      setError('Phone number is required');
       return;
     }
-    // Fake API call: send OTP
-    console.log('OTP sent to:', email);
-    localStorage.setItem('db_admin_forgot_email', email); // save email for next step
-    window.location.href = '/AdminVerifyOTP'; // navigate
+
+    try {
+      const res = await dispatch(db_sendOTP({ phone_number })).unwrap();
+      localStorage.setItem('db_admin_forgot_phone', phone_number);
+      toast.success(res.message || 'OTP sent successfully');
+      window.location.href = '/AdminVerifyOTP';
+    } catch (err) {
+      toast.error(err.message || 'Failed to send OTP');
+    }
   };
 
   return (
     <div className="d_auth_wrap">
       <div className="d_auth_container">
-        
         <div className="d_auth_card">
-               <img src={require('../Image/ki.png')} alt="Logo" className="d_auth_logo" />
-                 <p className="d_auth_subtitle fs-5">Forgot Password</p>
-          {/* <h3 className="text-center">Forgot Password</h3> */}
+          <img src={require('../Image/ki.png')} alt="Logo" className="d_auth_logo" />
+          <p className="d_auth_subtitle fs-5">Forgot Password</p>
           <form onSubmit={handleSubmit}>
             <div className="d_auth_group">
-              <label className="d_auth_label">Enter your email</label>
+              <label className="d_auth_label">Enter your phone number</label>
               <input
-                type="email"
+                type="tel"
                 className="d_auth_input"
-                placeholder="Enter your registered email"
-                value={email}
+                placeholder="Enter your registered phone number"
+                value={phone_number}
                 onChange={(e) => {
-                  setEmail(e.target.value);
+                  setPhoneNumber(e.target.value);
                   setError('');
                 }}
               />
