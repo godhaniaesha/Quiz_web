@@ -11,78 +11,197 @@ const Quizzes = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedLanguages, setSelectedLanguages] = useState([]);
-  const [email, setEmail] = useState("");
-  const [quizzes, setQuizzes] = useState([]);
 
-  const languages = ["HTML", "CSS", "JavaScript", "PHP", "React", "Node.js"];
-  const statuses = ["all", "Active", "Inactive", "Draft"];
-
-  const handleLanguageToggle = (lang) => {
-    setSelectedLanguages((prev) =>
-      prev.includes(lang)
-        ? prev.filter((l) => l !== lang)
-        : [...prev, lang]
-    );
-  };
-
-  const handleCreateQuiz = () => {
-    if (selectedLanguages.length === 0 || !email.trim()) {
-      alert("Please select at least one language and enter an email.");
-      return;
-    }
-
-    const timestamp = new Date().toISOString();
-
-    const newQuizzes = selectedLanguages.map((lang, index) => ({
-      id: quizzes.length + index + 1,
-      title: `${lang} Quiz`,
-      description: `Quiz for ${lang} technology - all levels.`,
-      category: lang,
-      difficulty: "Mixed",
-      questionsCount: 30,
+  // Mock data for quizzes
+  const [quizzes] = useState([
+    {
+      id: 1,
+      title: "JavaScript Fundamentals",
+      description: "Test your knowledge of JavaScript basics including variables, functions, and DOM manipulation.",
+      category: "Programming",
+      difficulty: "Beginner",
+      questionsCount: 25,
       timeLimit: 30,
       status: "Active",
-      createdDate: timestamp,
+      createdDate: "2024-01-15",
+      totalParticipants: 1250,
+      avgScore: 78,
+      lastModified: "2024-01-20"
+    },
+    {
+      id: 2,
+      title: "React Development",
+      description: "Advanced React concepts including hooks, context, and performance optimization.",
+      category: "Web Development",
+      difficulty: "Advanced",
+      questionsCount: 40,
+      timeLimit: 45,
+      status: "Active",
+      createdDate: "2024-01-10",
+      totalParticipants: 890,
+      avgScore: 65,
+      lastModified: "2024-01-18"
+    },
+    {
+      id: 3,
+      title: "CSS Layout Mastery",
+      description: "Master CSS Grid, Flexbox, and responsive design principles.",
+      category: "Web Development",
+      difficulty: "Intermediate",
+      questionsCount: 30,
+      timeLimit: 35,
+      status: "Active",
+      createdDate: "2024-01-12",
+      totalParticipants: 2100,
+      avgScore: 82,
+      lastModified: "2024-01-19"
+    },
+    {
+      id: 4,
+      title: "Data Structures & Algorithms",
+      description: "Test your understanding of fundamental data structures and algorithms.",
+      category: "Computer Science",
+      difficulty: "Advanced",
+      questionsCount: 50,
+      timeLimit: 60,
+      status: "Draft",
+      createdDate: "2024-01-08",
       totalParticipants: 0,
       avgScore: 0,
-      lastModified: timestamp,
-      email
-    }));
+      lastModified: "2024-01-15"
+    },
+    {
+      id: 5,
+      title: "HTML5 & Semantic Markup",
+      description: "Learn modern HTML5 features and semantic markup best practices.",
+      category: "Web Development",
+      difficulty: "Beginner",
+      questionsCount: 20,
+      timeLimit: 25,
+      status: "Active",
+      createdDate: "2024-01-05",
+      totalParticipants: 3200,
+      avgScore: 91,
+      lastModified: "2024-01-16"
+    },
+    {
+      id: 6,
+      title: "Node.js Backend Development",
+      description: "Server-side JavaScript with Node.js, Express, and database integration.",
+      category: "Backend Development",
+      difficulty: "Intermediate",
+      questionsCount: 35,
+      timeLimit: 40,
+      status: "Inactive",
+      createdDate: "2024-01-03",
+      totalParticipants: 750,
+      avgScore: 58,
+      lastModified: "2024-01-12"
+    }
+  ]);
 
-    setQuizzes((prev) => [...prev, ...newQuizzes]);
-    setShowModal(false);
-    setSelectedLanguages([]);
-    setEmail("");
-  };
+  const categories = ["all", "Programming", "Web Development", "Computer Science", "Backend Development", "Frontend Development"];
+  const difficulties = ["all", "Beginner", "Intermediate", "Advanced"];
+  const statuses = ["all", "Active", "Inactive", "Draft"];
 
-  const filteredQuizzes = quizzes.filter((quiz) => {
-    const matchesSearch =
-      quiz.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  // Filter and search quizzes
+  const filteredQuizzes = quizzes.filter(quiz => {
+    const matchesSearch = quiz.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       quiz.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       quiz.category.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === "all" || quiz.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
+  // Pagination
   const itemsPerPage = 5;
   const totalPages = Math.ceil(filteredQuizzes.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedQuizzes = filteredQuizzes.slice(startIndex, startIndex + itemsPerPage);
 
+  const handleEdit = (id) => {
+    console.log("Edit quiz:", id);
+    // Add edit functionality
+  };
+
+  const handleDelete = (id) => {
+    console.log("Delete quiz:", id);
+    // Add delete functionality
+  };
+
+  const handleView = (id) => {
+    console.log("View quiz:", id);
+    // Add view functionality
+  };
+
+  const handleDuplicate = (id) => {
+    console.log("Duplicate quiz:", id);
+    // Add duplicate functionality
+  };
+
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case "Active":
+        return <span className="Z_status_active">{status}</span>;
+      case "Inactive":
+        return <span className="Z_status_inactive">{status}</span>;
+      case "Draft":
+        return <span className="Z_status_draft">{status}</span>;
+      default:
+        return <span className="Z_status_inactive">{status}</span>;
+    }
+  };
+
+  const getDifficultyColor = (difficulty) => {
+    switch (difficulty) {
+      case "Beginner":
+        return { color: "#28a745" };
+      case "Intermediate":
+        return { color: "#ffc107" };
+      case "Advanced":
+        return { color: "#dc3545" };
+      default:
+        return { color: "#6c757d" };
+    }
+  };
+
   return (
     <Layout>
       <div className="Z_container">
+        {/* Page Header */}
         <div className="Z_page_header">
           <h1 className="Z_page_title">Quiz Management</h1>
-          <p className="Z_page_subtitle">Create quizzes based on selected technologies</p>
+          <p className="Z_page_subtitle">Create, organize, and manage your interview quizzes</p>
         </div>
 
+        {/* Stats Cards */}
+        <div className="Z_stats_container">
+          <div className="Z_stat_card">
+            <div className="Z_stat_number">{quizzes.length}</div>
+            <div className="Z_stat_label">Total Quizzes</div>
+          </div>
+          <div className="Z_stat_card">
+            <div className="Z_stat_number">{quizzes.filter(q => q.status === "Active").length}</div>
+            <div className="Z_stat_label">Active Quizzes</div>
+          </div>
+          <div className="Z_stat_card">
+            <div className="Z_stat_number">{quizzes.reduce((acc, q) => acc + q.totalParticipants, 0).toLocaleString()}</div>
+            <div className="Z_stat_label">Total Participants</div>
+          </div>
+          <div className="Z_stat_card">
+            <div className="Z_stat_number">{Math.round(quizzes.reduce((acc, q) => acc + q.avgScore, 0) / quizzes.filter(q => q.avgScore > 0).length)}%</div>
+            <div className="Z_stat_label">Avg Score</div>
+          </div>
+        </div>
+
+        {/* Controls Row - All in One Line */}
         <div className="row align-items-center mb-3 z_gap">
           <div className="col-sm-auto">
-            <button className="Z_add_new_btn w-100" onClick={() => setShowModal(true)}>
-              <span>+</span> Create New Quiz
+            {/* Add New Button */}
+            <button className="Z_add_new_btn w-100"
+              onClick={() => navigate("/register")}>
+              <span>+</span>
+              Create New Quiz
             </button>
           </div>
           <div className="col">
@@ -100,7 +219,7 @@ const Quizzes = () => {
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
             >
-              {statuses.map((status) => (
+              {statuses.map(status => (
                 <option key={status} value={status}>
                   {status === "all" ? "All Status" : status}
                 </option>
@@ -109,12 +228,27 @@ const Quizzes = () => {
           </div>
         </div>
 
-        {/* Quiz Table */}
+
+
+
+        {/* Quizzes Table */}
         <div className="Z_table_container">
           {loading ? (
-            <div className="Z_loading">Loading...</div>
+            <div className="Z_loading">
+              <div className="Z_spinner"></div>
+              <p>Loading quizzes...</p>
+            </div>
           ) : filteredQuizzes.length === 0 ? (
-            <div className="Z_empty_state">No quizzes found</div>
+            <div className="Z_empty_state">
+              <div className="Z_empty_icon">📊</div>
+              <h3 className="Z_empty_title">No quizzes found</h3>
+              <p className="Z_empty_message">
+                {searchTerm || filterStatus !== "all"
+                  ? "Try adjusting your search or filter criteria"
+                  : "Get started by creating your first quiz"
+                }
+              </p>
+            </div>
           ) : (
             <div className="Z_table_wrapper">
               <table className="Z_table" style={{ tableLayout: "auto", width: "100%" }}>
@@ -191,58 +325,31 @@ const Quizzes = () => {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="Z_pagination">
-            <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>
-              ← Prev
+            <button
+              className="Z_pagination_btn"
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              <FaAnglesLeft />
             </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
               <button
                 key={page}
-                className={currentPage === page ? "Z_pagination_btn_active" : ""}
+                className={`Z_pagination_btn ${currentPage === page ? 'Z_pagination_btn_active' : ''}`}
                 onClick={() => setCurrentPage(page)}
               >
                 {page}
               </button>
             ))}
-            <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>
-              Next →
-            </button>
-          </div>
-        )}
 
-        {/* Create Quiz Modal */}
-        {showModal && (
-          <div className="Z_modal_backdrop">
-            <div className="Z_modal">
-              <h2>Select Technologies</h2>
-              <div className="Z_modal_languages">
-                {languages.map((lang) => (
-                  <label key={lang} className="Z_checkbox_label">
-                    <input
-                      type="checkbox"
-                      value={lang}
-                      checked={selectedLanguages.includes(lang)}
-                      onChange={() => handleLanguageToggle(lang)}
-                    />
-                    {lang}
-                  </label>
-                ))}
-              </div>
-              <input
-                type="email"
-                placeholder="Enter employee email"
-                className="Z_modal_input"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <div className="Z_modal_buttons">
-                <button className="Z_btn Z_btn_primary" onClick={handleCreateQuiz}>
-                  Create Quiz
-                </button>
-                <button className="Z_btn Z_btn_danger" onClick={() => setShowModal(false)}>
-                  Cancel
-                </button>
-              </div>
-            </div>
+            <button
+              className="Z_pagination_btn"
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              <FaAnglesRight />
+            </button>
           </div>
         )}
       </div>
