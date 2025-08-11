@@ -6,78 +6,68 @@ const mongoose = require('mongoose');
 const generateQuiz = async (req, res) => {
     try {
         const { email, tech_Id } = req.body;
-        console.log(email, tech_Id, "jjjjjjjjj");
-
-        // Validate input
+ 
         if (!email || !tech_Id || !Array.isArray(tech_Id) || tech_Id.length === 0) {
             return res.status(400).json({
                 success: false,
                 message: 'Email and at least one technology ID are required'
             });
         }
-
-        const quizzes = [];
-
-        // Generate separate quiz for each technology
-        for (const techId of tech_Id) {
-            // First, count available questions
-            const questionCount = await Question.countDocuments({
-                tech_Id: new mongoose.Types.ObjectId(techId),
-                active: true
+ 
+        // Get total available questions for given techs
+        const questionCount = await Question.countDocuments({
+            tech_Id: { $in: tech_Id.map(id => new mongoose.Types.ObjectId(id)) },
+            active: true
+        });
+ 
+        const questionSize = Math.min(30, questionCount);
+ 
+        if (questionSize === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'No questions available for selected technologies'
             });
-
-            // Get all available questions if less than 30, otherwise get 30
-            const questionSize = Math.min(30, questionCount);
-
-            if (questionSize === 0) {
-                return res.status(400).json({
-                    success: false,
-                    message: `No questions available for technology ID: ${techId}`
-                });
-            }
-
-            // Get random questions
-            const questions = await Question.aggregate([
-                {
-                    $match: {
-                        tech_Id: new mongoose.Types.ObjectId(techId),
-                        active: true
-                    }
-                },
-                { $sample: { size: questionSize } }
-            ]);
-
-            // Create quiz for this technology
-            const quiz = new Quiz({
-                email,
-                tech_Id: [techId],
-                questions: questions.map(q => ({
-                    question_id: q._id,
-                    user_answer: '',
-                    status: 'unattempted'
-                }))
-            });
-
-            await quiz.save();
-
-            // Populate quiz details
-            const populatedQuiz = await Quiz.findById(quiz._id)
-                .populate({
-                    path: 'questions.question_id',
-                    select: 'Question options difficulty'
-                })
-                .populate('tech_Id', 'name');
-
-            quizzes.push(populatedQuiz);
         }
-
+ 
+        // Pick 30 random questions from all selected techs
+        const questions = await Question.aggregate([
+            {
+                $match: {
+                    tech_Id: { $in: tech_Id.map(id => new mongoose.Types.ObjectId(id)) },
+                    active: true
+                }
+            },
+            { $sample: { size: questionSize } }
+        ]);
+ 
+        // Create quiz document
+        const quiz = new Quiz({
+            email,
+            tech_Id,
+            questions: questions.map(q => ({
+                question_id: q._id,
+                user_answer: '',
+                status: 'unattempted'
+            }))
+        });
+ 
+        await quiz.save();
+ 
+        // Populate quiz
+        const populatedQuiz = await Quiz.findById(quiz._id)
+            .populate({
+                path: 'questions.question_id',
+                select: 'Question options difficulty'
+            })
+            .populate('tech_Id', 'name');
+ 
         res.status(201).json({
             success: true,
-            quizzes: quizzes,
+            quizzes: [populatedQuiz],
             startTime: new Date(),
             message: 'Quizzes generated successfully'
         });
-
+ 
     } catch (error) {
         console.error('Error generating quizzes:', error);
         res.status(500).json({
@@ -91,19 +81,16 @@ const generateQuiz = async (req, res) => {
 // Submit quiz answers and calculate time
 const submitQuiz = async (req, res) => {
     try {
-        console.log('Request body:', req.body); // Add this line for debugging
+        const { _id, answers, startTime } = req.body; // <-- using _id now
 
-        const { quizId, answers, startTime } = req.body;
-
-        // Validate input
-        if (!quizId || !answers || !startTime) {
+        if (!_id || !answers || !startTime) {
             return res.status(400).json({
                 success: false,
-                message: 'Quiz ID, answers, and start time are required'
+                message: 'Quiz _id, answers, and start time are required'
             });
         }
 
-        const quiz = await Quiz.findById(quizId).populate('questions.question_id');
+        const quiz = await Quiz.findById(_id).populate('questions.question_id');
         if (!quiz) {
             return res.status(404).json({
                 success: false,
@@ -111,36 +98,38 @@ const submitQuiz = async (req, res) => {
             });
         }
 
-        // Calculate time taken
         const endTime = new Date();
-        const timeTaken = (endTime - new Date(startTime)) / 1000; // in seconds
+        const timeTaken = (endTime - new Date(startTime)) / 1000;
 
-        // Update answers and check correctness
         let correctAnswers = 0;
         quiz.questions = quiz.questions.map((q, index) => {
             const userAnswer = answers[index];
-            const isCorrect = q.question_id.answer === userAnswer;
+            const correctAnswer = String(q.question_id.answer).trim().toLowerCase();
+            const submittedAnswer = String(userAnswer).trim().toLowerCase();
+
+            const isCorrect = correctAnswer === submittedAnswer;
             if (isCorrect) correctAnswers++;
 
             return {
-                ...q,
+                ...q.toObject(),
                 user_answer: userAnswer,
                 status: isCorrect ? 'correct' : 'incorrect',
                 updatedAt: endTime
             };
         });
 
-        quiz.status = 'inactive'; // Mark quiz as completed
+        quiz.status = 'inactive';
         await quiz.save();
 
         res.status(200).json({
             success: true,
             message: 'Quiz submitted successfully',
             result: {
-                totalQuestions: 30,
+                totalQuestions: quiz.questions.length,
                 correctAnswers,
+                wrongAnswers: quiz.questions.length - correctAnswers,
                 timeTaken,
-                score: (correctAnswers / 30) * 100
+                score: (correctAnswers / quiz.questions.length) * 100
             }
         });
 
@@ -154,17 +143,12 @@ const submitQuiz = async (req, res) => {
     }
 };
 
-// 1️⃣ Create new quiz
+// CRUD functions remain the same but also use _id instead of quizId
+
 const createQuiz = async (req, res) => {
     try {
         const { email, tech_Id, questions } = req.body;
-
-        const newQuiz = await Quiz.create({
-            email,
-            tech_Id,
-            questions
-        });
-
+        const newQuiz = await Quiz.create({ email, tech_Id, questions });
         res.status(201).json({ message: 'Quiz created successfully', quiz: newQuiz });
     } catch (error) {
         console.error('Error creating quiz:', error.message);
@@ -172,14 +156,11 @@ const createQuiz = async (req, res) => {
     }
 };
 
-
-// 2️⃣ Get all quizzes
 const getAllQuizzes = async (req, res) => {
     try {
         const quizzes = await Quiz.find()
             .populate('tech_Id')
             .populate('questions.question_id');
-
         res.status(200).json(quizzes);
     } catch (error) {
         console.error('Error fetching quizzes:', error.message);
@@ -187,19 +168,15 @@ const getAllQuizzes = async (req, res) => {
     }
 };
 
-// 3️⃣ Get quiz by ID
 const getQuizById = async (req, res) => {
     try {
-        const { id } = req.params;
-
+        const { id } = req.params; // still works with _id
         const quiz = await Quiz.findById(id)
             .populate('tech_Id')
             .populate('questions.question_id');
-
         if (!quiz) {
             return res.status(404).json({ message: 'Quiz not found' });
         }
-
         res.status(200).json(quiz);
     } catch (error) {
         console.error('Error fetching quiz:', error.message);
@@ -207,14 +184,12 @@ const getQuizById = async (req, res) => {
     }
 };
 
-// 4️⃣ Update quiz
 const updateQuiz = async (req, res) => {
     try {
         const { id } = req.params;
         const updates = req.body;
-
         updates['questions']?.forEach(q => {
-            q.updatedAt = new Date(); // update timestamp if question updated
+            q.updatedAt = new Date();
         });
 
         const updatedQuiz = await Quiz.findByIdAndUpdate(id, updates, { new: true })
@@ -224,7 +199,6 @@ const updateQuiz = async (req, res) => {
         if (!updatedQuiz) {
             return res.status(404).json({ message: 'Quiz not found' });
         }
-
         res.status(200).json({ message: 'Quiz updated successfully', quiz: updatedQuiz });
     } catch (error) {
         console.error('Error updating quiz:', error.message);
@@ -232,17 +206,13 @@ const updateQuiz = async (req, res) => {
     }
 };
 
-// 5️⃣ Delete quiz
 const deleteQuiz = async (req, res) => {
     try {
         const { id } = req.params;
-
         const deletedQuiz = await Quiz.findByIdAndDelete(id);
-
         if (!deletedQuiz) {
             return res.status(404).json({ message: 'Quiz not found' });
         }
-
         res.status(200).json({ message: 'Quiz deleted successfully' });
     } catch (error) {
         console.error('Error deleting quiz:', error.message);

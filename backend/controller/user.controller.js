@@ -158,7 +158,54 @@ exports.submitQuiz = async (req, res) => {
         });
     }
 };
+// Quiz Login by Email
+const db_loginQuiz = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ success: false, message: "Email required" });
+        }
+
+        // Find quiz by email and populate question details
+        const quiz = await Quiz.findOne({ email: email.trim() })
+            .populate({
+                path: 'questions.question_id',
+                select: 'Question options answer difficulty' // Add answer field for correct answers
+            })
+            .populate('tech_Id', 'name'); // Optional: tech name
+
+        if (!quiz) {
+            return res.status(404).json({ success: false, message: "User not found or quiz not found" });
+        }
+
+        // Return quiz details with questions & correct answers
+        return res.json({
+            success: true,
+            message: "Quiz login successful",
+            user: {
+                _id: quiz._id,
+                email: quiz.email,
+                tech_Id: quiz.tech_Id,
+                totalQuestions: quiz.questions.length
+            },
+            questions: quiz.questions.map(q => ({
+                question_id: q.question_id._id,
+                question: q.question_id.Question,
+                options: q.question_id.options,
+                correctAnswer: q.question_id.answer, // correct answer
+                difficulty: q.question_id.difficulty,
+                user_answer: q.user_answer,
+                status: q.status
+            }))
+        });
+    } catch (error) {
+        console.error("Login Error:", error);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+};
 
 module.exports = {
-    joinQuiz
+    joinQuiz,
+    db_loginQuiz
 }

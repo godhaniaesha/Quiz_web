@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
- 
+
 const quizSchema = new mongoose.Schema({
-    quizId: {
-        type: String,
-        // default: () => uuidv4(), // Generates a unique string ID
-        unique: true
-    },
     email: {
         type: String,
         required: true,
@@ -28,8 +23,7 @@ const quizSchema = new mongoose.Schema({
             required: true
         },
         user_answer: {
-            type: String,
-            required: false // e.g., "A", "B", "C", "D"
+            type: String
         },
         status: {
             type: String,
@@ -46,7 +40,7 @@ const quizSchema = new mongoose.Schema({
         }
     }]
 }, {
-    timestamps: true // auto adds createdAt and updatedAt for quiz document
+    timestamps: true
 });
- 
+
 module.exports = mongoose.model("Quiz", quizSchema);
