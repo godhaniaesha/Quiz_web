@@ -23,6 +23,7 @@ const Questions = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [questionToDelete, setQuestionToDelete] = useState(null);
   const { techs } = useSelector((state) => state.tech);
+  const [selectedTechnologies, setSelectedTechnologies] = useState([]);
 
 
   useEffect(() => {
@@ -35,14 +36,36 @@ const Questions = () => {
     ...new Set(questions.map((q) => q.tech_Id?.name).filter(Boolean))
   ];
 
-  const filteredQuestions = questions.filter((q) => {
-    const matchesSearch =
-      q.Question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      q.tech_Id?.name?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTechnology =
-      filterTechnology === "all" || q.tech_Id?.name === filterTechnology;
-    return matchesSearch && matchesTechnology;
+
+  const handleTechnologyToggle = (techName) => {
+  setSelectedTechnologies((prev) => {
+    if (prev.includes(techName)) {
+      return prev.filter((t) => t !== techName); // remove if already selected
+    } else {
+      return [...prev, techName]; // add if not selected
+    }
   });
+};
+  // const filteredQuestions = questions.filter((q) => {
+  //   const matchesSearch =
+  //     q.Question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     q.tech_Id?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+  //   const matchesTechnology =
+  //     filterTechnology === "all" || q.tech_Id?.name === filterTechnology;
+  //   return matchesSearch && matchesTechnology;
+  // });
+
+  const filteredQuestions = questions.filter((q) => {
+  const matchesSearch =
+    q.Question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    q.tech_Id?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+
+  const matchesTechnology =
+    selectedTechnologies.length === 0 || selectedTechnologies.includes(q.tech_Id?.name);
+
+  return matchesSearch && matchesTechnology;
+});
+
 
   const itemsPerPage = 5;
   const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage);
@@ -129,7 +152,7 @@ const Questions = () => {
             <div className="Z_stat_number">{questions.filter((q) => !q.active).length}</div>
             <div className="Z_stat_label">Inactive Questions</div>
           </div>
-         
+
         </div>
 
         {/* Controls Row - All in One Line */}
@@ -157,7 +180,7 @@ const Questions = () => {
           </div>
         </div>
 
-        <div className="z_technology-filters">
+        {/* <div className="z_technology-filters">
           {techs?.map((tech) => (
             <div
               key={tech._id}
@@ -168,7 +191,21 @@ const Questions = () => {
               <span>{tech.name}</span>
             </div>
           ))}
+        </div> */}
+
+        <div className="z_technology-filters">
+          {techs?.map((tech) => (
+            <div
+              key={tech._id}
+              className={`filter-box ${selectedTechnologies.includes(tech.name) ? 'active' : ''}`}
+              onClick={() => handleTechnologyToggle(tech.name)}
+            >
+              {selectedTechnologies.includes(tech.name) && <span className="z_check">✓</span>}
+              <span>{tech.name}</span>
+            </div>
+          ))}
         </div>
+
 
 
         {/* Questions Table */}

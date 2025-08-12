@@ -58,35 +58,35 @@ const Quizzes = () => {
 
   // 🔵 Map quizzes
   // 🔵 Map quizzes
-const mappedQuizzes = Array.isArray(quizzes)
-? quizzes.map((quiz) => ({
-    id: quiz._id || "N/A",
-    title: quiz.tech_Id?.map((t) => t.name).join(", ") || "N/A",
-    description: `Quiz for ${quiz.email || "N/A"}`,
-    category: quiz.tech_Id?.map((t) => t.name).join(", ") || "N/A",
-    difficulty: quiz.difficulty || "N/A",
-    questionsCount: quiz.questions?.length ?? 0,
-    timeLimit: quiz.timeLimit ?? 30,
-    status:
-      quiz.status?.toLowerCase() === "active"
-        ? "Active"
-        : quiz.status?.toLowerCase() === "inactive"
-        ? "Inactive"
-        : "Draft",
-    createdDate: quiz.createdAt
-      ? new Date(quiz.createdAt).toISOString().slice(0, 10)
-      : "N/A",
-    totalParticipants: quiz.totalParticipants ?? 0,
-    // 🟢 Use the score from backend
-    avgScore:
-      quiz.questions?.length > 0
-        ? Math.round((quiz.score / quiz.questions.length) * 100)
-        : 0,
-    lastModified: quiz.updatedAt
-      ? new Date(quiz.updatedAt).toISOString().slice(0, 10)
-      : "N/A",
-  }))
-: [];
+  const mappedQuizzes = Array.isArray(quizzes)
+    ? quizzes.map((quiz) => ({
+      id: quiz._id || "N/A",
+      title: quiz.tech_Id?.map((t) => t.name).join(", ") || "N/A",
+      description: `Quiz for ${quiz.email || "N/A"}`,
+      category: quiz.tech_Id?.map((t) => t.name).join(", ") || "N/A",
+      difficulty: quiz.difficulty || "N/A",
+      questionsCount: quiz.questions?.length ?? 0,
+      timeLimit: quiz.timeLimit ?? 30,
+      status:
+        quiz.status?.toLowerCase() === "active"
+          ? "Active"
+          : quiz.status?.toLowerCase() === "inactive"
+            ? "Inactive"
+            : "Draft",
+      createdDate: quiz.createdAt
+        ? new Date(quiz.createdAt).toISOString().slice(0, 10)
+        : "N/A",
+      totalParticipants: quiz.totalParticipants ?? 0,
+      // 🟢 Use the score from backend
+      avgScore:
+        quiz.questions?.length > 0
+          ? Math.round((quiz.score / quiz.questions.length) * 100)
+          : 0,
+      lastModified: quiz.updatedAt
+        ? new Date(quiz.updatedAt).toISOString().slice(0, 10)
+        : "N/A",
+    }))
+    : [];
 
   const reversedQuizzes = mappedQuizzes.slice().reverse();
 
@@ -105,7 +105,7 @@ const mappedQuizzes = Array.isArray(quizzes)
       filterStatus === "all" || quiz.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
-  
+
 
   console.log("🟡 Filtered quizzes (after search & status):", filteredQuizzes);
 
@@ -149,7 +149,7 @@ const mappedQuizzes = Array.isArray(quizzes)
             </div>
             <div className="Z_stat_label">INActive Quizzes</div>
           </div>
-        
+
         </div>
 
         {/* Controls */}
@@ -213,14 +213,14 @@ const mappedQuizzes = Array.isArray(quizzes)
                 <thead className="Z_table_header">
                   <tr>
                     <th>Quiz Title</th>
-                    <th>Category</th> 
+                    <th>Category</th>
                     <th>Questions</th>
                     <th>Time Limit</th>
                     <th>Status</th>
-               
+
                     <th>Avg Score</th>
                     <th>Last Modified</th>
-                  
+
                   </tr>
                 </thead>
                 <tbody className="Z_table_body">
@@ -253,16 +253,16 @@ const mappedQuizzes = Array.isArray(quizzes)
                           </div>
                         </td>
                         <td>{quiz.category}</td>
-                      
+
                         <td>{quiz.questionsCount}</td>
                         <td>{quiz.timeLimit} min</td>
                         <td>{getStatusBadge(quiz.status)}</td>
-                      
+
                         <td>{quiz.avgScore}%</td>
                         <td>
                           {new Date(quiz.lastModified).toLocaleDateString()}
                         </td>
-                      
+
                       </tr>
                     );
                   })}

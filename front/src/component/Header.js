@@ -1,16 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { IoMenu } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
 import "../style/x_app.css";
 import { FaSignOutAlt } from 'react-icons/fa';
+import LogoutModal from './LogoutModal';
 
 const Header = ({ toggleSidebar }) => {
     const navigate = useNavigate();
-    const handleLogout = () => {
-        localStorage.clear(); // or remove specific tokens/user info
-        // redirect to login page or home
-        navigate('/login'); // if using react-router's useNavigate
-    };
+     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+    
     return (
         <section className='x_header'>
             <header className="header">
@@ -25,15 +23,30 @@ const Header = ({ toggleSidebar }) => {
                     </div>
                 </div>
 
-                <div className="x_user-profile" style={{ cursor: 'pointer' }}>
+                {/* <div className="x_user-profile" style={{ cursor: 'pointer' }}>
                     <button className="btn btn-outline-secondary d-flex align-items-center" onClick={handleLogout}>
+                        <FaSignOutAlt style={{ marginRight: 6 }} />
+                        Logout
+                    </button>
+                </div> */}
+
+                <div className="x_user-profile" style={{ cursor: "pointer" }}>
+                    <button
+                        className="btn btn-outline-secondary d-flex align-items-center"
+                        onClick={() => setIsLogoutModalOpen(true)} // Just open modal
+                    >
                         <FaSignOutAlt style={{ marginRight: 6 }} />
                         Logout
                     </button>
                 </div>
 
-            </header>
-        </section>
+                {/* Modal */}
+                <LogoutModal
+                    open={isLogoutModalOpen}
+                    onCancel={() => setIsLogoutModalOpen(false)}
+                />
+        </header>
+        </section >
     );
 };
 

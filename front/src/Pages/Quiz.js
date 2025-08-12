@@ -220,14 +220,14 @@ export default function Quiz() {
                 </div>
               </div>
               <div className="d_performance-message mt-3">
-                {score >= 24 && <p className="text-success">🌟 Excellent!</p>}
-                {score >= 18 && score < 24 && <p className="text-info">👏 Good job!</p>}
-                {score >= 12 && score < 18 && <p className="text-warning">💪 Keep practicing!</p>}
-                {score < 12 && <p className="text-danger">📚 Study harder!</p>}
+                {score >= 24 && <p className="text-success"><img src="https://media.istockphoto.com/id/2166921455/vector/quality-or-certified-ribbon-icon-vector-design.jpg?b=1&s=170x170&k=20&c=voT_ue1CkGMeDZOytBy8TAyyQF-Fnzn-fJFYTUtHtaA=" style={{width:"35px"}}></img>Excellent!</p>}
+                {score >= 18 && score < 24 && <p className="text-info"><img src="https://cdn-icons-png.flaticon.com/512/3712/3712146.png" style={{width:"35px"}}></img> Good job!</p>}
+                {score >= 12 && score < 18 && <p className="text-warning"><img src="https://media.istockphoto.com/id/2166921455/vector/quality-or-certified-ribbon-icon-vector-design.jpg?b=1&s=170x170&k=20&c=voT_ue1CkGMeDZOytBy8TAyyQF-Fnzn-fJFYTUtHtaA=" style={{width:"35px"}}></img> Keep practicing!</p>}
+                {score < 12 && <p className="text-danger"><img src="https://cdn-icons-png.flaticon.com/512/2232/2232688.png" style={{width:"35px"}}></img> Study harder!</p>}
               </div>
-              <button className="btn d_btn-primary btn-lg mt-4" onClick={resetQuiz}>
+              {/* <button className="btn d_btn-primary btn-lg mt-4" onClick={resetQuiz}>
                 Restart Quiz
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
