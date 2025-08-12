@@ -1,34 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Modal, Table } from 'react-bootstrap';
 import { FaChevronLeft, FaChevronRight, FaUser } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+import { db_getAllQuizzes } from "../redux/slice/quiz.slice";
 import '../style/d_style.css';
 import Layout from '../component/Layout';
 
-// Sample user data
-const usersData = {
-  '2025-08-01': [
-    { email: 'alice@example.com', tech: ['JavaScript', 'React'], score: 88 },
-    { email: 'bob@example.com', tech: ['Python'], score: 92 },
-  ],
-  '2025-08-05': [
-    { email: 'charlie@example.com', tech: ['Java', 'SQL'], score: 81 }
-  ],
-  '2025-08-07': [
-    { email: 'david@example.com', tech: ['React', 'Node.js'], score: 84 },
-  ],
-  '2025-08-10': [
-    { email: 'eve@example.com', tech: ['Node.js', 'MongoDB'], score: 91 },
-    { email: 'frank@example.com', tech: ['Python'], score: 79 },
-  ],
-};
-
 const Dashboard = () => {
+  const dispatch = useDispatch();
+
+  // Redux quizzes state
+  const { quizzes } = useSelector(state => state.quiz);
+
+  // Calendar state
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
+
+  // Modal state for inactive quizzes on selected date
   const [showModal, setShowModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
-  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [selectedQuizzes, setSelectedQuizzes] = useState([]);
+
+  // Map of date string -> count of inactive quizzes on that date
+  const [inactiveCountsByDate, setInactiveCountsByDate] = useState({});
+
+  // List of inactive quizzes grouped by date for modal display
+  const [inactiveQuizzesByDate, setInactiveQuizzesByDate] = useState({});
 
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const monthNames = [
@@ -37,6 +35,35 @@ const Dashboard = () => {
   ];
 
   const getDaysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
+
+  useEffect(() => {
+    dispatch(db_getAllQuizzes());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (Array.isArray(quizzes)) {
+      // Filter inactive quizzes
+      const inactiveQuizzes = quizzes.filter(
+        q => q.status && q.status.toLowerCase() === 'inactive'
+      );
+
+      // Group by updatedAt date (YYYY-MM-DD)
+      const counts = {};
+      const grouped = {};
+
+      inactiveQuizzes.forEach(quiz => {
+        if (quiz.updatedAt) {
+          const date = new Date(quiz.updatedAt).toISOString().slice(0, 10);
+          counts[date] = (counts[date] || 0) + 1;
+          grouped[date] = grouped[date] || [];
+          grouped[date].push(quiz);
+        }
+      });
+
+      setInactiveCountsByDate(counts);
+      setInactiveQuizzesByDate(grouped);
+    }
+  }, [quizzes]);
 
   const handlePrevMonth = () => {
     const newMonth = currentMonth === 0 ? 11 : currentMonth - 1;
@@ -52,55 +79,57 @@ const Dashboard = () => {
     setCurrentYear(newYear);
   };
 
-  const handleCellClick = (dateStr, users) => {
-    setSelectedDate(dateStr);
-    setSelectedUsers(users);
-    setShowModal(true);
+  const handleCellClick = (dateStr) => {
+    if (inactiveQuizzesByDate[dateStr]) {
+      setSelectedDate(dateStr);
+      setSelectedQuizzes(inactiveQuizzesByDate[dateStr]);
+      setShowModal(true);
+    }
   };
 
- const renderCalendar = () => {
-  const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-  const totalDays = getDaysInMonth(currentMonth, currentYear);
-  const calendarCells = [];
-  let day = 1;
+  const renderCalendar = () => {
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const totalDays = getDaysInMonth(currentMonth, currentYear);
+    const calendarCells = [];
+    let day = 1;
 
-  const todayDateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const todayDateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-  for (let week = 0; week < 6; week++) {
-    const row = [];
-    for (let d = 0; d < 7; d++) {
-      if ((week === 0 && d < firstDay) || day > totalDays) {
-        row.push(<td key={d} className="d_CP_empty-cell"></td>);
-      } else {
-        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const users = usersData[dateStr];
-        const isToday = dateStr === todayDateStr;
+    for (let week = 0; week < 6; week++) {
+      const row = [];
+      for (let d = 0; d < 7; d++) {
+        if ((week === 0 && d < firstDay) || day > totalDays) {
+          row.push(<td key={d} className="d_CP_empty-cell"></td>);
+        } else {
+          const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          const count = inactiveCountsByDate[dateStr] || 0;
+          const isToday = dateStr === todayDateStr;
 
-        row.push(
-          <td
-            key={d}
-            className={`d_CP_calendar-cell ${users ? 'd_CP_has-users' : ''} ${isToday ? 'd_today' : ''}`}
-            onClick={() => users && handleCellClick(dateStr, users)}
-          >
-            <div className="d_CP_cell-content">
-              <div className="d_CP_date">{day}</div>
-              {users && (
-                <div className="d_CP_user-badge">
-                  <FaUser className="me-1" />
-                  {users.length}
-                </div>
-              )}
-            </div>
-          </td>
-        );
-        day++;
+          row.push(
+            <td
+              key={d}
+              className={`d_CP_calendar-cell ${count > 0 ? 'd_CP_has-users' : ''} ${isToday ? 'd_today' : ''}`}
+              onClick={() => handleCellClick(dateStr)}
+              style={{ cursor: count > 0 ? 'pointer' : 'default' }}
+            >
+              <div className="d_CP_cell-content">
+                <div className="d_CP_date">{day}</div>
+                {count > 0 && (
+                  <div className="d_CP_user-badge">
+                    <FaUser className="me-1" />
+                    {count}
+                  </div>
+                )}
+              </div>
+            </td>
+          );
+          day++;
+        }
       }
+      calendarCells.push(<tr key={week}>{row}</tr>);
     }
-    calendarCells.push(<tr key={week}>{row}</tr>);
-  }
-
-  return calendarCells;
-};
+    return calendarCells;
+  };
 
   return (
     <Layout>
@@ -108,7 +137,7 @@ const Dashboard = () => {
         <Row className="justify-content-center mb-3">
           <Col xs={12} className="text-center">
             <h3 className="fw-bold" style={{color:'#6159a1'}}>Quiz Performance Calendar</h3>
-            <p className="text-muted">Click on dates to view users' combined quiz results</p>
+            <p className="text-muted">Click on dates to view inactive quizzes attempted</p>
           </Col>
         </Row>
 
@@ -143,31 +172,33 @@ const Dashboard = () => {
           </Col>
         </Row>
 
-        {/* Modal for user performance */}
-        <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        {/* Modal to show inactive quizzes details for selected date */}
+        <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
           <Modal.Header closeButton>
-            <Modal.Title>User Performance - {selectedDate}</Modal.Title>
+            <Modal.Title>Inactive Quizzes on {selectedDate}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {selectedUsers.length === 0 ? (
-              <p>No data available.</p>
+            {selectedQuizzes.length === 0 ? (
+              <p>No inactive quizzes on this date.</p>
             ) : (
               <Table bordered hover responsive>
                 <thead>
                   <tr>
                     <th>#</th>
+                    <th>Quiz Title / ID</th>
+                    <th>Status</th>
                     <th>Email</th>
-                    <th>Techs</th>
                     <th>Score</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {selectedUsers.map((user, index) => (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>{user.email}</td>
-                      <td>{user.tech.join(', ')}</td>
-                      <td>{user.score}</td>
+                  {selectedQuizzes.map((quiz, idx) => (
+                    <tr key={quiz._id || idx}>
+                      <td>{idx + 1}</td>
+                      <td>{quiz.tech_Id?.map(t => t.name).join(', ') || quiz._id || "N/A"}</td>
+                      <td>{quiz.status}</td>
+                      <td>{quiz.email || 'N/A'}</td>
+                      <td>{quiz.score ?? 'N/A'}</td>
                     </tr>
                   ))}
                 </tbody>

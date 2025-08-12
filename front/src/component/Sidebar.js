@@ -55,15 +55,15 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <li>Quizzes</li>
           </NavLink>
 
-          <NavLink
+          {/* <NavLink
             to="/results"
             className={({ isActive }) => isActive ? "active" : ""}
             onClick={handleMenuItemClick}
           >
             <li>Results</li>
-          </NavLink>
+          </NavLink> */}
 
-          <div
+          {/* <div
             onClick={() => {
               setShowLogoutModal(true);
               if (window.innerWidth <= 768) {
@@ -72,9 +72,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             }}
             className="nav-link-custom">
             <li>Logout</li>
-          </div>
+          </div> */}
 
-          {showLogoutModal && (
+          {/* {showLogoutModal && (
             <LogoutModal
               open={showLogoutModal}
               onCancel={() => setShowLogoutModal(false)}
@@ -84,7 +84,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 navigate('/login');
               }}
             />
-          )}
+          )} */}
 
         </ul>
       </div>

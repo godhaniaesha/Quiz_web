@@ -62,7 +62,7 @@ const generateQuiz = async (req, res) => {
             startTime: new Date(),
             message: 'Quizzes generated successfully'
         });
- 
+
     } catch (error) {
         console.error('Error generating quizzes:', error);
         res.status(500).json({
@@ -153,17 +153,38 @@ const createQuiz = async (req, res) => {
     }
 };
 
+
 const getAllQuizzes = async (req, res) => {
     try {
-        const quizzes = await Quiz.find()
-            .populate('tech_Id')
-            .populate('questions.question_id');
-        res.status(200).json(quizzes);
+      const quizzes = await Quiz.find()
+        .populate("tech_Id") // Populate technology details
+        .populate("questions.question_id") // Populate question details
+        .lean();
+  
+      // Add score calculation for each quiz
+      const quizzesWithScore = quizzes.map(q => {
+        const score = q.questions.filter(que => que.status === "correct").length;
+        return {
+          ...q,
+          score
+        };
+      });
+  
+      res.status(200).json({
+        success: true,
+        count: quizzesWithScore.length,
+        data: quizzesWithScore
+      });
     } catch (error) {
-        console.error('Error fetching quizzes:', error.message);
-        res.status(500).json({ message: 'Failed to fetch quizzes' });
+      console.error("Error fetching quizzes:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch quizzes",
+        error: error.message
+      });
     }
-};
+  };
+
 
 const getQuizById = async (req, res) => {
     try {

@@ -26,10 +26,12 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [validationError, setValidationError] = useState('');
 
+  // Load user data on mount or when userId changes
   useEffect(() => {
     if (userId) dispatch(db_getUserById(userId));
   }, [dispatch, userId]);
 
+  // Update form and preview when user data changes
   useEffect(() => {
     if (user?.data) {
       const data = user.data;
@@ -40,9 +42,25 @@ export default function Profile() {
         role: data.role || '',
         bio: data.bio || '',
       });
-      setPreviewImage(data.profileImage || '');
+
+      // If profileImage is a filename, prepend your uploads path here:
+      const imageUrl = data.profileImage
+        ? data.profileImage.startsWith('http') // or startsWith('/')
+          ? data.profileImage
+          : `/uploads/${data.profileImage}`
+        : '';
+      setPreviewImage(imageUrl);
     }
   }, [user]);
+
+  // Cleanup previewImage URL when component unmounts or previewImage changes (if it's a blob URL)
+  useEffect(() => {
+    return () => {
+      if (previewImage && previewImage.startsWith('blob:')) {
+        URL.revokeObjectURL(previewImage);
+      }
+    };
+  }, [previewImage]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -88,16 +106,24 @@ export default function Profile() {
     });
 
     if (profileImage) {
-      updatedForm.append('profileImage', profileImage); // multer field
+      updatedForm.append('profileImage', profileImage);
     }
 
     setValidationError('');
     dispatch(db_updateUser({ id: userId, updatedData: updatedForm }))
       .unwrap()
-      .then(() => {
+      .then((res) => {
         toast.success('Profile updated successfully!');
         setIsEditing(false);
         setProfileImage(null);
+
+        // Update preview image with returned profileImage URL from server
+        if (res.data.profileImage) {
+          const newImageUrl = res.data.profileImage.startsWith('http')
+            ? res.data.profileImage
+            : `/uploads/${res.data.profileImage}`;
+          setPreviewImage(newImageUrl);
+        }
       })
       .catch((err) => {
         toast.error(err?.message || 'Update failed');

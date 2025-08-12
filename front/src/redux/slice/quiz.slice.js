@@ -1,11 +1,10 @@
-// src/redux/slices/quiz.slice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const API_URL_USER = "http://localhost:5000/api/user";
 const API_URL_QUIZ = "http://localhost:5000/api/quiz";
 
-// 🎯 1. Generate Quiz
+// 1. Generate Quiz
 export const db_generateQuiz = createAsyncThunk(
   "quiz/generateQuiz",
   async (data, thunkAPI) => {
@@ -18,7 +17,7 @@ export const db_generateQuiz = createAsyncThunk(
   }
 );
 
-// 🎯 2. Login Quiz
+// 2. Login Quiz
 export const db_loginQuiz = createAsyncThunk(
   "quiz/loginQuiz",
   async (data, thunkAPI) => {
@@ -31,12 +30,12 @@ export const db_loginQuiz = createAsyncThunk(
   }
 );
 
-// 🎯 3. Submit Quiz
+// 3. Submit Quiz
 export const db_submitQuiz = createAsyncThunk(
   "quiz/submitQuiz",
   async (data, thunkAPI) => {
     try {
-      const response = await axios.post(`${API_URL_QUIZ}/submit-quiz`, data);
+      const response = await axios.post(`${API_URL_QUIZ}/submit`, data);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || error.message);
@@ -44,12 +43,25 @@ export const db_submitQuiz = createAsyncThunk(
   }
 );
 
-// 🎯 4. Get All Quizzes
+// 4. Get All Quizzes
 export const db_getAllQuizzes = createAsyncThunk(
   "quiz/getAllQuizzes",
   async (_, thunkAPI) => {
     try {
       const response = await axios.get(`${API_URL_QUIZ}`);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// 5. Get Quiz by ID
+export const db_getQuizById = createAsyncThunk(
+  "quiz/getQuizById",
+  async (id, thunkAPI) => {
+    try {
+      const response = await axios.get(`${API_URL_QUIZ}/${id}`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data || error.message);
@@ -65,12 +77,14 @@ const quizSlice = createSlice({
     loading: false,
     error: null,
     result: null, // for submit results
+    userAnswers: [], // (not used in current component, but can be added if centralized answer tracking is desired)
   },
   reducers: {
     db_resetQuizState(state) {
       state.currentQuiz = null;
       state.result = null;
       state.error = null;
+      state.userAnswers = [];
     },
   },
   extraReducers: (builder) => {
@@ -82,6 +96,7 @@ const quizSlice = createSlice({
       .addCase(db_generateQuiz.fulfilled, (state, action) => {
         state.loading = false;
         state.currentQuiz = action.payload;
+        state.result = action.payload; // if you want to store result here
       })
       .addCase(db_generateQuiz.rejected, (state, action) => {
         state.loading = false;
@@ -120,9 +135,22 @@ const quizSlice = createSlice({
       })
       .addCase(db_getAllQuizzes.fulfilled, (state, action) => {
         state.loading = false;
-        state.quizzes = action.payload;
+        state.quizzes = action.payload.data || [];  // <-- Use data array here
       })
       .addCase(db_getAllQuizzes.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Get Quiz by ID
+      .addCase(db_getQuizById.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(db_getQuizById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentQuiz = action.payload;
+      })
+      .addCase(db_getQuizById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

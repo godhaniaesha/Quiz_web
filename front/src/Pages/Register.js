@@ -23,31 +23,35 @@ export default function Register() {
   const [searchText, setSearchText] = useState("");
   const [email, setEmail] = useState("");
 
+  // Fetch tech list on page load
   useEffect(() => {
     dispatch(fetchTechs());
   }, [dispatch]);
 
+  // Show quiz error in toast
   useEffect(() => {
     if (quizError) {
-      toast.error(quizError);
+      toast.error(
+        typeof quizError === "string"
+          ? quizError
+          : quizError.message || "Something went wrong"
+      );
     }
   }, [quizError]);
 
-useEffect(() => {
-  if (result && !quizLoading) {
-    toast.success("Quiz generated successfully!");
-    
-    // Reset form
-    setEmail("");
-    setSelectedTech([]);
-    setSearchText("");
+  // Redirect when quiz is generated successfully
+  useEffect(() => {
+    if (result && !quizLoading) {
+      toast.success("Quiz generated successfully!");
+      setEmail("");
+      setSelectedTech([]);
+      setSearchText("");
 
-    // Redirect after short delay so toast is visible
-    setTimeout(() => {
-      navigate("/quizzes");
-    }, 1500);
-  }
-}, [result, quizLoading, navigate]);
+      setTimeout(() => {
+        navigate("/quizzes");
+      }, 1500);
+    }
+  }, [result, quizLoading, navigate]);
 
   const handleCheckboxToggle = (lang) => {
     setSelectedTech((prev) =>
@@ -98,7 +102,7 @@ useEffect(() => {
 
   return (
     <Layout>
-      <ToastContainer></ToastContainer>
+      <ToastContainer />
       <div className="d_auth_wrap">
         <div className="d_auth_container">
           <div className="d_auth_card">
@@ -124,7 +128,12 @@ useEffect(() => {
                 <label className="d_auth_label">Select Tech Languages</label>
 
                 {techLoading && <p>Loading tech languages...</p>}
-                {techError && toast.error(techError)}
+                {techError &&
+                  toast.error(
+                    typeof techError === "string"
+                      ? techError
+                      : techError.message || "Error loading technologies"
+                  )}
 
                 <input
                   type="text"
@@ -193,8 +202,6 @@ useEffect(() => {
           </div>
         </div>
       </div>
-
-      
     </Layout>
   );
 }

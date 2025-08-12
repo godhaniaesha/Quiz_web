@@ -129,12 +129,7 @@ const Questions = () => {
             <div className="Z_stat_number">{questions.filter((q) => !q.active).length}</div>
             <div className="Z_stat_label">Inactive Questions</div>
           </div>
-          <div className="Z_stat_card">
-            <div className="Z_stat_number">
-              {questions.filter((q) => q.tech_Id?.name === "JavaScript").length}
-            </div>
-            <div className="Z_stat_label">JavaScript Questions</div>
-          </div>
+         
         </div>
 
         {/* Controls Row - All in One Line */}

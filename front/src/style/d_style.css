@@ -1,3 +1,9 @@
+body{
+  background-color: #e5e5e5 !important;
+  font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-weight: 500 !important;
+}
+
 .d_auth_wrap {
   /* background: radial-gradient(ellipse at top, #222831, #1e2730); */
   min-height: 100vh;
