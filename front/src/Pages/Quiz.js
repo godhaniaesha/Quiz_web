@@ -13,10 +13,10 @@ export default function Quiz() {
   const [timeLeft, setTimeLeft] = useState(45);
   const [score, setScore] = useState(0);
   const [answers, setAnswers] = useState([]);
-  const [userAnswers, setUserAnswers] = useState([]); // API માટે user answers store કરવા માટે
+  const [userAnswers, setUserAnswers] = useState([]);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [isAnswered, setIsAnswered] = useState(false);
-  const [startTime] = useState(new Date().toISOString()); // Quiz start time
+  const [startTime] = useState(new Date().toISOString());
 
   // ✅ Fetch quiz on mount
   useEffect(() => {
@@ -45,29 +45,40 @@ export default function Quiz() {
         setCurrentQuestion(parsed.currentQuestion || 0);
         setScore(parsed.score || 0);
         setAnswers(parsed.answers || []);
-        setUserAnswers(parsed.userAnswers || []); // Load user answers
+        setUserAnswers(parsed.userAnswers || []);
         setQuizCompleted(parsed.quizCompleted || false);
         setSelectedAnswer(parsed.selectedAnswer ?? null);
         setIsAnswered(parsed.isAnswered || false);
+        setTimeLeft(parsed.timeLeft ?? 45); // ✅ Load saved timer value
       } catch {
         // Ignore invalid storage data
       }
     }
   }, []);
 
-  // ✅ Save state to localStorage
+  // ✅ Save state to localStorage (now includes timeLeft)
   useEffect(() => {
     const stateToSave = {
       currentQuestion,
       score,
       answers,
-      userAnswers, // Save user answers
+      userAnswers,
       quizCompleted,
       selectedAnswer,
       isAnswered,
+      timeLeft, // ✅ Save timer
     };
     localStorage.setItem("quizState", JSON.stringify(stateToSave));
-  }, [currentQuestion, score, answers, userAnswers, quizCompleted, selectedAnswer, isAnswered]);
+  }, [
+    currentQuestion,
+    score,
+    answers,
+    userAnswers,
+    quizCompleted,
+    selectedAnswer,
+    isAnswered,
+    timeLeft,
+  ]);
 
   // ✅ Safe backend data map
   const quizData = useMemo(() => {
@@ -84,7 +95,7 @@ export default function Quiz() {
   // ✅ Timer logic
   useEffect(() => {
     if (timeLeft > 0 && !isAnswered && !quizCompleted) {
-      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      const timer = setTimeout(() => setTimeLeft((prev) => prev - 1), 1000);
       return () => clearTimeout(timer);
     } else if (timeLeft === 0 && !isAnswered) {
       handleTimeOut();
@@ -92,9 +103,7 @@ export default function Quiz() {
   }, [timeLeft, isAnswered, quizCompleted]);
 
   const handleTimeOut = () => {
-    // Time up થયું હોય તો null અથવા empty string store કરો
-    setUserAnswers((prev) => [...prev, null]); // or "" based on your API requirement
-    
+    setUserAnswers((prev) => [...prev, null]);
     setAnswers((prev) => [
       ...prev,
       { questionIndex: currentQuestion, selectedAnswer: null, correct: false },
@@ -107,10 +116,7 @@ export default function Quiz() {
     setSelectedAnswer(answerIndex);
     setIsAnswered(true);
 
-    // Convert answer index to letter format (A, B, C, D)
     const answerLetter = String.fromCharCode(65 + answerIndex);
-    
-    // Store user answer for API submission
     setUserAnswers((prev) => [...prev, answerLetter]);
 
     const isCorrect = answerIndex === quizData[currentQuestion].correct;
@@ -137,17 +143,27 @@ export default function Quiz() {
 
   const completeQuiz = () => {
     setQuizCompleted(true);
-    
-    // Submit quiz data to API
+
     const quizSubmissionData = {
       _id: currentQuiz._id || localStorage.getItem("quizId"),
       answers: userAnswers,
       startTime: startTime,
     };
-    
-    // API call કરો
+
     dispatch(db_submitQuiz(quizSubmissionData));
   };
+ 
+  useEffect(() => {
+    const disableCopy = (e) => e.preventDefault();
+    document.addEventListener("copy", disableCopy);
+    document.addEventListener("cut", disableCopy);
+    document.addEventListener("contextmenu", disableCopy);
+    return () => {
+      document.removeEventListener("copy", disableCopy);
+      document.removeEventListener("cut", disableCopy);
+      document.removeEventListener("contextmenu", disableCopy);
+    };
+  }, []);
 
   const resetQuiz = () => {
     setCurrentQuestion(0);
@@ -155,13 +171,15 @@ export default function Quiz() {
     setTimeLeft(45);
     setScore(0);
     setAnswers([]);
-    setUserAnswers([]); // Reset user answers
+    setUserAnswers([]);
     setQuizCompleted(false);
     setIsAnswered(false);
     localStorage.removeItem("quizState");
   };
 
-  const getProgressPercentage = () => ((currentQuestion + 1) / quizData.length) * 100;
+  const getProgressPercentage = () =>
+    ((currentQuestion + 1) / quizData.length) * 100;
+
   const getTimerColor = () =>
     timeLeft <= 10 ? "danger" : timeLeft <= 20 ? "warning" : "success";
 
@@ -170,7 +188,7 @@ export default function Quiz() {
     return <div className="text-center mt-5">Loading quiz...</div>;
   }
 
-  // ✅ Error screen → force re-login
+  // ✅ Error
   if (error) {
     const errorMessage =
       typeof error === "string" ? error : error?.message || JSON.stringify(error);
@@ -196,7 +214,7 @@ export default function Quiz() {
     );
   }
 
-  // ✅ No data fallback
+  // ✅ No data
   if (!quizData.length) {
     return <div className="text-center mt-5">No quiz data found</div>;
   }
@@ -220,14 +238,27 @@ export default function Quiz() {
                 </div>
               </div>
               <div className="d_performance-message mt-3">
-                {score >= 24 && <p className="text-success"><img src="https://media.istockphoto.com/id/2166921455/vector/quality-or-certified-ribbon-icon-vector-design.jpg?b=1&s=170x170&k=20&c=voT_ue1CkGMeDZOytBy8TAyyQF-Fnzn-fJFYTUtHtaA=" style={{width:"35px"}}></img>Excellent!</p>}
-                {score >= 18 && score < 24 && <p className="text-info"><img src="https://cdn-icons-png.flaticon.com/512/3712/3712146.png" style={{width:"35px"}}></img> Good job!</p>}
-                {score >= 12 && score < 18 && <p className="text-warning"><img src="https://media.istockphoto.com/id/2166921455/vector/quality-or-certified-ribbon-icon-vector-design.jpg?b=1&s=170x170&k=20&c=voT_ue1CkGMeDZOytBy8TAyyQF-Fnzn-fJFYTUtHtaA=" style={{width:"35px"}}></img> Keep practicing!</p>}
-                {score < 12 && <p className="text-danger"><img src="https://cdn-icons-png.flaticon.com/512/2232/2232688.png" style={{width:"35px"}}></img> Study harder!</p>}
+                {score >= 24 && (
+                  <p className="text-success">
+                    <img src="https://media.istockphoto.com/id/2166921455/vector/quality-or-certified-ribbon-icon-vector-design.jpg" style={{ width: "35px" }} /> Excellent!
+                  </p>
+                )}
+                {score >= 18 && score < 24 && (
+                  <p className="text-info">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3712/3712146.png" style={{ width: "35px" }} /> Good job!
+                  </p>
+                )}
+                {score >= 12 && score < 18 && (
+                  <p className="text-warning">
+                    <img src="https://media.istockphoto.com/id/2166921455/vector/quality-or-certified-ribbon-icon-vector-design.jpg" style={{ width: "35px" }} /> Keep practicing!
+                  </p>
+                )}
+                {score < 12 && (
+                  <p className="text-danger">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2232/2232688.png" style={{ width: "35px" }} /> Study harder!
+                  </p>
+                )}
               </div>
-              {/* <button className="btn d_btn-primary btn-lg mt-4" onClick={resetQuiz}>
-                Restart Quiz
-              </button> */}
             </div>
           </div>
         </div>
