@@ -123,7 +123,7 @@ body{
 
 .Z_table {
   width: 100%;
-  min-width: 1200px;
+  /* min-width: 1200px; */
   border-collapse: collapse;
   background: white;
   table-layout: fixed;
@@ -785,4 +785,13 @@ body{
     font-size: 12px;
     padding: 6px 10px;
   }
+}
+.Z_filter_select {
+  appearance: none;      /* Remove default arrow */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 40px;   /* Space for custom arrow */
+  background: url('data:image/svg+xml;utf8,<svg fill="gray" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
+  background-size: 16px; /* size of the arrow */
+  background-color: white;
 }

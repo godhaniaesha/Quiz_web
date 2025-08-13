@@ -24,7 +24,7 @@ const Quizzes = () => {
     dispatch(db_getAllQuizzes());
   }, [dispatch]);
 
-  const statuses = ["all", "Active", "Inactive", "Draft"];
+  const statuses = ["all", "Active", "Inactive"];
 
   const handleEdit = (id) => console.log("Edit quiz:", id);
   const handleDelete = (id) => console.log("Delete quiz:", id);
@@ -36,8 +36,7 @@ const Quizzes = () => {
         return <span className="Z_status_active">{status}</span>;
       case "Inactive":
         return <span className="Z_status_inactive">{status}</span>;
-      case "Draft":
-        return <span className="Z_status_draft">{status}</span>;
+    
       default:
         return <span className="Z_status_inactive">{status}</span>;
     }
@@ -215,7 +214,6 @@ const Quizzes = () => {
                     <th>Quiz Title</th>
                     <th>Category</th>
                     <th>Questions</th>
-                    <th>Time Limit</th>
                     <th>Status</th>
 
                     <th>Avg Score</th>
@@ -255,7 +253,7 @@ const Quizzes = () => {
                         <td>{quiz.category}</td>
 
                         <td>{quiz.questionsCount}</td>
-                        <td>{quiz.timeLimit} min</td>
+                       
                         <td>{getStatusBadge(quiz.status)}</td>
 
                         <td>{quiz.avgScore}%</td>

@@ -131,7 +131,7 @@ export default function AdminLogin() {
                             {loading ? 'Signing in...' : 'Sign In'}
                         </button>
 
-                        <div className="d-flex justify-content-end align-items-center mt-2">
+                        <div className="d-flex justify-content-center align-items-center mt-2">
                             <a href="/AdminRegister" className="small" style={{ color: '#6159a1', textDecoration: 'none' }}>
                                 Don’t have an account? Register
                             </a>
