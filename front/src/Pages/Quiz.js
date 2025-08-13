@@ -17,6 +17,7 @@ export default function Quiz() {
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [isAnswered, setIsAnswered] = useState(false);
   const [startTime] = useState(new Date().toISOString());
+  const [tabSwitchCount, setTabSwitchCount] = useState(0);
 
   // ✅ Fetch quiz on mount
   useEffect(() => {
@@ -164,6 +165,28 @@ export default function Quiz() {
       document.removeEventListener("contextmenu", disableCopy);
     };
   }, []);
+   useEffect(() => {
+    const handleTabChange = () => {
+      if (document.hidden && !quizCompleted) {
+        setTabSwitchCount((prevCount) => {
+          const newCount = prevCount + 1;
+
+          if (newCount === 1) {
+            alert("⚠️ Warning: Do not switch tabs during the quiz!");
+          } else if (newCount >= 2) {
+            alert("🚫 You switched tabs again. The quiz will now be submitted.");
+            completeQuiz();
+          }
+
+          return newCount;
+        });
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleTabChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleTabChange);
+  }, [quizCompleted]);
 
   const resetQuiz = () => {
     setCurrentQuestion(0);
