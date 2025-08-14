@@ -174,7 +174,7 @@ export default function Quiz() {
           if (newCount === 1) {
             alert("⚠️ Warning: Do not switch tabs during the quiz!");
           } else if (newCount >= 2) {
-            alert("🚫 You switched tabs again. The quiz will now be submitted.");
+            alert("🚫 You switched tabs again. So the quiz has been submitted. ");
             completeQuiz();
           }
 
