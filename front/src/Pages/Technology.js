@@ -166,7 +166,7 @@ const Technology = () => {
 
               {showCreate && (
                 <tr>
-                  <td colSpan={2}>
+                  <td colSpan={3}>
                     <div
                       style={{
                         display: "flex",
