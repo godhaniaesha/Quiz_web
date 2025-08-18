@@ -119,7 +119,7 @@ const Technology = () => {
                         style={{ width: "90%" }}
                       />
                     ) : (
-                      tech.name
+                       tech.name.length > 50 ? tech.name.substring(0, 50) + "..." : tech.name
                     )}
                   </td>
                   <td>
